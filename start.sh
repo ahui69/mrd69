@@ -18,6 +18,19 @@ pip install -r requirements.txt
 echo "Instalowanie dodatkowych pakietów (LangChain, AI, Pamięć)..."
 pip install langchain langchain-openai openai sentence-transformers scikit-learn networkx uvicorn
 
+echo "--- 🏗️ Budowanie front-endu ---"
+# Sprawdź, czy jest zainstalowany npm, jeśli nie, spróbuj zainstalować
+if ! command -v npm &> /dev/null
+then
+    echo "npm nie znaleziony, próba instalacji nodejs..."
+    # To zadziała na systemach bazujących na Debianie/Ubuntu
+    apt-get update && apt-get install -y nodejs npm
+fi
+echo "Instalowanie zależności front-endu (npm install)..."
+npm install
+echo "Budowanie front-endu (npm run build)..."
+npm run build
+
 echo "--- 🌐 Tworzenie plików frontendu ---"
 mkdir -p static
 
