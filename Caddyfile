@@ -1,0 +1,95 @@
+# Caddyfile - Reverse proxy configuration for Mordzix
+
+# Replace with your domain
+your-domain.com {
+    # TLS settings
+    tls {
+        protocols tls1.2 tls1.3
+    }
+    
+    # Security headers
+    header {
+        # HSTS
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        # XSS Protection
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        # Hide server info
+        -Server
+    }
+    
+    # Rate limiting
+    rate_limit {
+        zone static_rl {
+            key {remote_host}
+            events 60
+            window 1m
+        }
+        zone api_rl {
+            key {remote_host} 
+            events 10
+            window 1m
+        }
+    }
+    
+    # Static files and general endpoints
+    @static {
+        path /static/* /health /ws
+    }
+    
+    # API endpoints (more restrictive)
+    @api {
+        path /run /knowledge/* /chat/*
+    }
+    
+    # Apply rate limits
+    rate_limit @static static_rl
+    rate_limit @api api_rl
+    
+    # Compression
+    encode gzip zstd
+    
+    # Reverse proxy to backend
+    reverse_proxy {
+        to 127.0.0.1:6969
+        
+        # Timeouts
+        transport http {
+            read_timeout 60s
+            write_timeout 60s
+            dial_timeout 5s
+        }
+        
+        # Health check
+        health_uri /health
+        health_interval 30s
+        health_timeout 10s
+        
+        # Headers
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    
+    # Body size limit (10MB)
+    request_body {
+        max_size 10MB
+    }
+    
+    # Logging
+    log {
+        output file /var/log/caddy/mordzix.log {
+            roll_size 100MB
+            roll_keep 5
+        }
+        format json
+        level INFO
+    }
+}
+
+# HTTP redirect to HTTPS
+http://your-domain.com {
+    redir https://{host}{uri} permanent
+}

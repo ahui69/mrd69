@@ -1,0 +1,13 @@
+{
+  "place": "Kraków",
+  "days": 2,
+  "mood": "spokój",
+  "schedule_type": "spokojne",
+  "cost_estimate": {
+    "low": 60,
+    "high": 140
+  },
+  "restaurants_count": 0,
+  "hotels_count": 0,
+  "attractions_count": 0
+}

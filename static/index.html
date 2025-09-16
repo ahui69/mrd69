@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Asystent AI</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rubik+Mono+One&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin=""/>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+</head>
+<body>
+    <div id="app-container">
+        <!-- Panel boczny z historią rozmów -->
+        <div id="history-panel">
+            <h3>Historia Rozmów</h3>
+            <ul id="history-list"></ul>
+        </div>
+        
+        <!-- Panel map -->
+        <div id="maps-panel">
+            <div class="maps-header">
+                <h3>Mapy i Trasy</h3>
+                <button id="maps-close" class="panel-close">×</button>
+            </div>
+            <div class="maps-search">
+                <div class="maps-input-group">
+                    <input type="text" id="maps-start" placeholder="Punkt startowy" />
+                    <button class="maps-location-btn" id="maps-gps-btn" title="Użyj mojej lokalizacji">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="8"/>
+                            <circle cx="12" cy="12" r="2"/>
+                            <line x1="12" y1="2" x2="12" y2="4"/>
+                            <line x1="12" y1="20" x2="12" y2="22"/>
+                            <line x1="2" y1="12" x2="4" y2="12"/>
+                            <line x1="20" y1="12" x2="22" y2="12"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="maps-input-group">
+                    <input type="text" id="maps-end" placeholder="Cel podróży" />
+                    <button class="maps-swap-btn" id="maps-swap-btn" title="Zamień A/B">⇅</button>
+                    <select id="maps-mode" title="Tryb trasy">
+                        <option value="driving" selected>Samochód</option>
+                        <option value="walking">Pieszo</option>
+                        <option value="cycling">Rower</option>
+                    </select>
+                    <button class="maps-search-btn" id="maps-route-btn">Wyznacz trasę</button>
+                </div>
+            </div>
+            <div id="maps-container"></div>
+            <div id="route-info"></div>
+            <div id="route-steps"></div>
+        </div>
+
+        <!-- Panel wyszukiwania wiedzy -->
+        <div id="search-panel">
+            <div class="search-header">
+                <h3>Wyszukiwanie Wiedzy</h3>
+                <button id="search-close" class="panel-close">×</button>
+            </div>
+            <div class="search-form">
+                <div class="search-input-group">
+                    <input type="text" id="search-query" placeholder="Wpisz zapytanie..." />
+                    <button class="search-btn" id="search-btn">Szukaj</button>
+                </div>
+                <div class="search-options">
+                    <label>
+                        <input type="checkbox" id="search-auto" checked />
+                        Automatycznie szukaj dla pytań
+                    </label>
+                </div>
+            </div>
+            <div id="search-results"></div>
+        </div>
+
+        <!-- Główny kontener czatu -->
+        <div id="chat-container">
+            <!-- Górny pasek nawigacyjny -->
+            <header id="top-bar">
+                <div class="left">
+                    <button id="btn-new" class="graffiti-btn">Nowa rozmowa</button>
+                    <button id="btn-history" class="graffiti-btn">Historia</button>
+                    <button id="btn-maps" class="graffiti-btn">Mapy</button>
+                    <button id="btn-search" class="graffiti-btn">Wyszukaj wiedzę</button>
+                </div>
+                <div class="right">
+                    <button id="tts-toggle" class="graffiti-btn" title="Głos asystenta">🔊</button>
+                    <span id="status-dot" title="Status połączenia">●</span>
+                </div>
+            </header>
+
+            <!-- Obszar wiadomości -->
+            <div id="chat-messages">
+                <div id="messages"></div>
+                <div id="typing-indicator">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+
+            <!-- Obszar plików do wysłania -->
+            <div id="file-preview-area"></div>
+
+            <!-- Obszar wprowadzania wiadomości -->
+            <div id="input-area">
+                <button id="mic-button" aria-label="Nagrywaj">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" fill="currentColor"/>
+                        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" fill="currentColor"/>
+                    </svg>
+                </button>
+                <div id="message-input-container">
+                    <textarea 
+                        id="message-input" 
+                        placeholder="Napisz wiadomość..." 
+                        rows="1" 
+                        autofocus
+                    ></textarea>
+                    <label for="file-input" id="file-button">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13.5 6l-8.4 8.4c-1.2 1.2-1.2 3.1 0 4.2 1.2 1.2 3.1 1.2 4.2 0l9.4-9.4c2-2 2-5.1 0-7.1-2-2-5.1-2-7.1 0l-9.4 9.4c-2.7 2.7-2.7 7.2 0 9.9 2.7 2.7 7.2 2.7 9.9 0L21 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <input type="file" id="file-input" multiple>
+                    </label>
+                </div>
+                <button id="send-button" aria-label="Wyślij">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // iOS dynamic viewport height fix
+        function setVh() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        window.addEventListener('resize', setVh);
+        window.addEventListener('orientationchange', setVh);
+        document.addEventListener('DOMContentLoaded', setVh);
+    </script>
+    <script src="/static/script.js"></script>
+</body>
+</html>

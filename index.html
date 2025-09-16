@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mordzix Overmind</title>
+    <style>
+        :root {
+            --background-color: #121212;
+            --surface-color: #1e1e1e;
+            --primary-color: #bb86fc;
+            --on-surface-color: #e0e0e0;
+            --on-background-color: #e0e0e0;
+            --border-color: #333;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--on-background-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        #chat-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: var(--surface-color);
+        }
+        #messages {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+        .message {
+            max-width: 80%;
+            padding: 0.75rem;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+        .user-message {
+            background-color: var(--primary-color);
+            color: #000;
+            align-self: flex-end;
+            border-bottom-right-radius: 0;
+        }
+        .bot-message {
+            background-color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+        .bot-message pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background-color: #111;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+        #input-area {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+        #msg-input {
+            flex-grow: 1;
+            background-color: #333;
+            border: 1px solid #555;
+            border-radius: 20px;
+            padding: 0.75rem 1rem;
+            color: var(--on-surface-color);
+            font-size: 1rem;
+            margin-right: 0.5rem;
+        }
+        #msg-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        button {
+            background-color: var(--primary-color);
+            border: none;
+            color: #000;
+            padding: 0.75rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #file-upload-label {
+            padding: 0.75rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            background-color: #333;
+            margin-right: 0.5rem;
+        }
+        #file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="messages"></div>
+        <div id="input-area">
+            <input type="text" id="msg-input" placeholder="Napisz wiadomość...">
+            <label for="file-input" id="file-upload-label">📎</label>
+            <input type="file" id="file-input">
+            <button id="send-btn">Wyślij</button>
+        </div>
+    </div>
+
+    <script>
+        const messagesContainer = document.getElementById('messages');
+        const msgInput = document.getElementById('msg-input');
+        const sendBtn = document.getElementById('send-btn');
+        const fileInput = document.getElementById('file-input');
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+            
+            // Simple markdown to HTML for code blocks
+            if (sender === 'bot' && text.includes('```')) {
+                const parts = text.split('```');
+                let htmlContent = '';
+                parts.forEach((part, index) => {
+                    if (index % 2 === 1) {
+                        htmlContent += `<pre><code>${part.trim()}</code></pre>`;
+                    } else {
+                        htmlContent += part.trim().replace(/\\n/g, '<br>');
+                    }
+                });
+                messageDiv.innerHTML = htmlContent;
+            } else {
+                messageDiv.textContent = text;
+            }
+
+            messagesContainer.prepend(messageDiv);
+        }
+
+        async function sendMessage() {
+            const msg = msgInput.value.trim();
+            const file = fileInput.files[0];
+
+            if (!msg && !file) return;
+
+            const formData = new FormData();
+            if (msg) {
+                formData.append('msg', msg);
+                addMessage(msg, 'user');
+            }
+            if (file) {
+                formData.append('file', file);
+                addMessage(`Wysyłam plik: ${file.name}`, 'user');
+            }
+            
+            msgInput.value = '';
+            fileInput.value = '';
+
+            try {
+                const response = await fetch('/chat_ui', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                let botResponse = '';
+                if (data.error) {
+                    botResponse = `Błąd: ${data.error}`;
+                } else if (data.msg) {
+                    botResponse = data.msg;
+                }
+
+                if (data.result) {
+                    botResponse += `\n\n\`\`\`json\n${JSON.stringify(data.result, null, 2)}\n\`\`\``;
+                }
+                
+                addMessage(botResponse, 'bot');
+
+            } catch (error) {
+                addMessage(`Błąd połączenia: ${error.message}`, 'bot');
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        msgInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        addMessage('Cześć! Jestem Mordzix. W czym mogę pomóc?', 'bot');
+    </script>
+</body>
+</html>

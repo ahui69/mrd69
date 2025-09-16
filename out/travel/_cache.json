@@ -1,0 +1,44 @@
+{
+  "entries": {
+    "0e329a41cc139ffc45a0d1b978573ce781c07d47e30ba9bc44df02a8d4fb3443": {
+      "ts": 1757981912.495153,
+      "st": 200,
+      "body": "[{\"place_id\":134131805,\"licence\":\"Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright\",\"osm_type\":\"relation\",\"osm_id\":62422,\"lat\":\"52.5108850\",\"lon\":\"13.3989367\",\"class\":\"boundary\",\"type\":\"administrative\",\"place_rank\":8,\"importance\":0.840425236063765,\"addresstype\":\"city\",\"name\":\"Berlin\",\"display_name\":\"Berlin, Deutschland\",\"boundingbox\":[\"52.3382448\",\"52.6755087\",\"13.0883450\",\"13.7611609\"]}]",
+      "source": "osm"
+    },
+    "ec8a7d8c58a859eb605464990d73d8d20be094dd645d05887a3f14943acd6b92": {
+      "ts": 1757981912.6909256,
+      "st": 200,
+      "body": "{\"latitude\":52.52,\"longitude\":13.4,\"generationtime_ms\":0.022411346435546875,\"utc_offset_seconds\":7200,\"timezone\":\"Europe/Berlin\",\"timezone_abbreviation\":\"GMT+2\",\"elevation\":40.0,\"hourly_units\":{\"time\":\"iso8601\",\"temperature_2m\":\"°C\"},\"hourly\":{\"time\":[\"2025-09-16T00:00\",\"2025-09-16T01:00\",\"2025-09-16T02:00\",\"2025-09-16T03:00\",\"2025-09-16T04:00\",\"2025-09-16T05:00\",\"2025-09-16T06:00\",\"2025-09-16T07:00\",\"2025-09-16T08:00\",\"2025-09-16T09:00\",\"2025-09-16T10:00\",\"2025-09-16T11:00\",\"2025-09-16T12:00\",\"2025-09-16T13:00\",\"2025-09-16T14:00\",\"2025-09-16T15:00\",\"2025-09-16T16:00\",\"2025-09-16T17:00\",\"2025-09-16T18:00\",\"2025-09-16T19:00\",\"2025-09-16T20:00\",\"2025-09-16T21:00\",\"2025-09-16T22:00\",\"2025-09-16T23:00\"],\"temperature_2m\":[16.5,16.8,16.8,15.8,15.7,15.3,15.0,14.8,15.1,15.6,16.3,16.6,17.2,17.7,17.4,18.0,17.9,18.5,18.5,17.8,16.9,15.7,15.0,14.5]}}",
+      "source": "weather"
+    },
+    "84381a5d67e3ecfae95955943f4475b350a316872c26d60ef2795377f8e37226": {
+      "ts": 1757986126.5044382,
+      "st": 200,
+      "body": "[{\"place_id\":166394392,\"licence\":\"Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright\",\"osm_type\":\"relation\",\"osm_id\":449696,\"lat\":\"50.0619474\",\"lon\":\"19.9368564\",\"class\":\"boundary\",\"type\":\"administrative\",\"place_rank\":12,\"importance\":0.7443578372353242,\"addresstype\":\"city\",\"name\":\"Kraków\",\"display_name\":\"Kraków, województwo małopolskie, Polska\",\"boundingbox\":[\"49.9676668\",\"50.1261338\",\"19.7922355\",\"20.2173455\"]}]",
+      "source": "osm"
+    },
+    "1b58d0f6cfc3919d8ec0ad1de4dc9d1152dbe9c70d85b9d9d656e8299a1b237c": {
+      "ts": 1757986126.6954143,
+      "st": 200,
+      "body": "{\"latitude\":50.064266,\"longitude\":19.923676,\"generationtime_ms\":0.02968311309814453,\"utc_offset_seconds\":7200,\"timezone\":\"Europe/Warsaw\",\"timezone_abbreviation\":\"GMT+2\",\"elevation\":222.0,\"hourly_units\":{\"time\":\"iso8601\",\"temperature_2m\":\"°C\"},\"hourly\":{\"time\":[\"2025-09-16T00:00\",\"2025-09-16T01:00\",\"2025-09-16T02:00\",\"2025-09-16T03:00\",\"2025-09-16T04:00\",\"2025-09-16T05:00\",\"2025-09-16T06:00\",\"2025-09-16T07:00\",\"2025-09-16T08:00\",\"2025-09-16T09:00\",\"2025-09-16T10:00\",\"2025-09-16T11:00\",\"2025-09-16T12:00\",\"2025-09-16T13:00\",\"2025-09-16T14:00\",\"2025-09-16T15:00\",\"2025-09-16T16:00\",\"2025-09-16T17:00\",\"2025-09-16T18:00\",\"2025-09-16T19:00\",\"2025-09-16T20:00\",\"2025-09-16T21:00\",\"2025-09-16T22:00\",\"2025-09-16T23:00\"],\"temperature_2m\":[16.5,16.2,15.8,15.4,16.0,16.6,16.2,16.6,16.7,17.2,17.5,17.9,18.2,19.3,18.6,18.9,18.6,18.3,17.3,15.8,14.9,14.3,13.9,13.5]}}",
+      "source": "weather"
+    },
+    "930db8f29763ebb6d28666d659ebe7a81e78afead422f175ac548456fa119290": {
+      "ts": 1757986126.741641,
+      "st": 200,
+      "body": "{\"latitude\":50.064266,\"longitude\":19.923676,\"generationtime_ms\":0.09894371032714844,\"utc_offset_seconds\":7200,\"timezone\":\"Europe/Warsaw\",\"timezone_abbreviation\":\"GMT+2\",\"elevation\":222.0,\"daily_units\":{\"time\":\"iso8601\",\"temperature_2m_max\":\"°C\",\"temperature_2m_min\":\"°C\",\"precipitation_sum\":\"mm\",\"weathercode\":\"wmo code\"},\"daily\":{\"time\":[\"2025-09-16\",\"2025-09-17\",\"2025-09-18\"],\"temperature_2m_max\":[19.3,15.9,19.5],\"temperature_2m_min\":[13.5,10.2,8.2],\"precipitation_sum\":[10.20,1.00,0.00],\"weathercode\":[65,51,3]}}",
+      "source": "weather"
+    },
+    "e1c56cb89aec77a621ac96610c97bfa8d480dadd71a0b24966dd35e5e28d587c": {
+      "ts": 1757986128.1046693,
+      "st": 401,
+      "body": "{\"error\":\"Unauthorized\"}",
+      "source": "transitland"
+    }
+  },
+  "metadata": {
+    "created": 1757981911.8876216,
+    "size": 4355
+  }
+}

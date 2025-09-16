@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- Safari Specific Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mordzix">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- PWA Support -->
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- Prefetch for better performance -->
+    <link rel="dns-prefetch" href="//localhost:8080">
+    <link rel="preconnect" href="//localhost:8080">
+    
+    <title>Mordzix - AI bez kagańca 🚀</title>YPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 MORDZIX - AI bez kagańca</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .status {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .status.connected { color: #4ade80; }
+        .status.connecting { color: #fbbf24; }
+        .status.disconnected { color: #f87171; }
+        
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            position: relative;
+        }
+        
+        .message.user .message-content {
+            background: #007aff;
+            color: white;
+            margin-left: auto;
+        }
+        
+        .message.mordzix .message-content {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            margin-right: auto;
+        }
+        
+        .message.system .message-content {
+            background: rgba(255, 193, 7, 0.2);
+            color: #856404;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 14px;
+            max-width: 90%;
+        }
+        
+        .message-time {
+            font-size: 12px;
+            opacity: 0.6;
+            margin-top: 5px;
+        }
+        
+        .message-status {
+            font-size: 12px;
+            margin-top: 2px;
+        }
+        
+        .input-container {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .input-area {
+            flex: 1;
+            min-height: 44px;
+            max-height: 120px;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.9);
+            resize: none;
+            outline: none;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+        
+        .input-area::placeholder {
+            color: #999;
+        }
+        
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 50%;
+            background: #007aff;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .send-btn:hover:not(:disabled) {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+        
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
+        .typing-indicator {
+            display: none;
+            margin-bottom: 15px;
+        }
+        
+        .typing-indicator .message-content {
+            background: rgba(255, 255, 255, 0.9);
+            color: #666;
+            font-style: italic;
+        }
+        
+        .typing-dots {
+            display: inline-block;
+        }
+        
+        .typing-dots span {
+            display: inline-block;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+        }
+        
+        .crypto-alert {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+            border-left: 4px solid #ff4757;
+        }
+        
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 100vh;
+                border: none;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="header">
+            <h1>🚀 MORDZIX</h1>
+            <div class="status connecting" id="status">Łączenie...</div>
+        </div>
+        
+        <div class="messages" id="messages">
+            <div class="message system">
+                <div class="message-content">
+                    Witaj! Jestem Mordzix - Twój ziomek od wszystkiego. Bez kagańca, bez filtrów, z mózgiem bestii! 💪
+                </div>
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typing">
+            <div class="message mordzix">
+                <div class="message-content">
+                    Mordzix pisze<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <div class="input-row">
+                <textarea 
+                    id="messageInput" 
+                    class="input-area" 
+                    placeholder="Napisz wiadomość..."
+                    rows="1"
+                ></textarea>
+                <button id="sendBtn" class="send-btn" disabled>➡️</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class MordzixChat {
+            constructor() {
+                this.ws = null;
+                this.userId = 'user_' + Math.random().toString(36).substr(2, 9);
+                this.threadId = null;
+                this.isConnected = false;
+                
+                this.messagesContainer = document.getElementById('messages');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.statusEl = document.getElementById('status');
+                this.typingIndicator = document.getElementById('typing');
+                
+                this.initializeEventListeners();
+                this.connectWebSocket();
+            }
+            
+            initializeEventListeners() {
+                // Send button
+                this.sendBtn.addEventListener('click', () => this.sendMessage());
+                
+                // Input handling
+                this.messageInput.addEventListener('input', () => {
+                    this.adjustTextareaHeight();
+                    this.updateSendButton();
+                });
+                
+                this.messageInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+                
+                // Auto-resize textarea
+                this.adjustTextareaHeight();
+            }
+            
+            connectWebSocket() {
+                try {
+                    const wsUrl = `ws://localhost:8080/mordzix/ws/${this.userId}`;
+                    this.ws = new WebSocket(wsUrl);
+                    
+                    this.ws.onopen = () => {
+                        console.log('Connected to Mordzix WebSocket');
+                        this.isConnected = true;
+                        this.updateStatus('connected', '🟢 Połączony z Mordzix');
+                    };
+                    
+                    this.ws.onmessage = (event) => {
+                        const data = JSON.parse(event.data);
+                        this.handleWebSocketMessage(data);
+                    };
+                    
+                    this.ws.onclose = () => {
+                        console.log('Disconnected from Mordzix WebSocket');
+                        this.isConnected = false;
+                        this.updateStatus('disconnected', '🔴 Rozłączono');
+                        
+                        // Reconnect after 3 seconds
+                        setTimeout(() => this.connectWebSocket(), 3000);
+                    };
+                    
+                    this.ws.onerror = (error) => {
+                        console.error('WebSocket error:', error);
+                        this.updateStatus('disconnected', '❌ Błąd połączenia');
+                    };
+                    
+                } catch (error) {
+                    console.error('Failed to connect WebSocket:', error);
+                    this.updateStatus('disconnected', '❌ Nie można połączyć');
+                    
+                    // Try HTTP fallback
+                    this.useHttpFallback();
+                }
+            }
+            
+            useHttpFallback() {
+                console.log('Using HTTP fallback mode');
+                this.isConnected = true;
+                this.updateStatus('connected', '🟡 HTTP mode');
+            }
+            
+            handleWebSocketMessage(data) {
+                console.log('Received:', data);
+                
+                if (data.type === 'system') {
+                    this.addMessage('system', data.content, data.timestamp);
+                } else if (data.type === 'chat_response') {
+                    this.hideTyping();
+                    this.addMessage('mordzix', data.content, data.timestamp);
+                } else if (data.type === 'crypto_alert') {
+                    this.addMessage('system', data.content, data.timestamp, 'crypto-alert');
+                } else if (data.type === 'error') {
+                    this.hideTyping();
+                    this.addMessage('system', `❌ ${data.content}`, data.timestamp);
+                }
+            }
+            
+            async sendMessage() {
+                const content = this.messageInput.value.trim();
+                if (!content || !this.isConnected) return;
+                
+                // Add user message immediately (optimistic UI)
+                this.addMessage('user', content, Date.now() / 1000);
+                this.messageInput.value = '';
+                this.adjustTextareaHeight();
+                this.updateSendButton();
+                
+                // Show typing indicator
+                this.showTyping();
+                
+                try {
+                    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+                        // WebSocket mode
+                        this.ws.send(JSON.stringify({
+                            type: 'chat',
+                            thread_id: this.threadId,
+                            content: content,
+                            message_type: 'text'
+                        }));
+                    } else {
+                        // HTTP fallback
+                        await this.sendMessageHTTP(content);
+                    }
+                } catch (error) {
+                    console.error('Send message error:', error);
+                    this.hideTyping();
+                    this.addMessage('system', '❌ Błąd wysyłania wiadomości', Date.now() / 1000);
+                }
+            }
+            
+            async sendMessageHTTP(content) {
+                try {
+                    const response = await fetch('/mordzix/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            thread_id: this.threadId,
+                            user_id: this.userId,
+                            content: content,
+                            message_type: 'text'
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.status === 'success') {
+                        this.threadId = data.thread_id;
+                        this.hideTyping();
+                        this.addMessage('mordzix', data.content, data.timestamp);
+                    } else {
+                        throw new Error(data.message || 'Unknown error');
+                    }
+                    
+                } catch (error) {
+                    console.error('HTTP send error:', error);
+                    this.hideTyping();
+                    this.addMessage('system', `❌ ${error.message}`, Date.now() / 1000);
+                }
+            }
+            
+            addMessage(sender, content, timestamp, extraClass = '') {
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${sender} ${extraClass}`;
+                
+                const time = new Date(timestamp * 1000).toLocaleTimeString('pl-PL', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                messageEl.innerHTML = `
+                    <div class="message-content">
+                        ${this.formatMessage(content)}
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+                
+                this.messagesContainer.appendChild(messageEl);
+                this.scrollToBottom();
+            }
+            
+            formatMessage(content) {
+                // Simple formatting - can be enhanced
+                return content
+                    .replace(/\n/g, '<br>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>');
+            }
+            
+            showTyping() {
+                this.typingIndicator.style.display = 'block';
+                this.scrollToBottom();
+            }
+            
+            hideTyping() {
+                this.typingIndicator.style.display = 'none';
+            }
+            
+            scrollToBottom() {
+                setTimeout(() => {
+                    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+                }, 100);
+            }
+            
+            adjustTextareaHeight() {
+                this.messageInput.style.height = 'auto';
+                this.messageInput.style.height = Math.min(this.messageInput.scrollHeight, 120) + 'px';
+            }
+            
+            updateSendButton() {
+                const hasContent = this.messageInput.value.trim().length > 0;
+                this.sendBtn.disabled = !hasContent || !this.isConnected;
+            }
+            
+            updateStatus(type, text) {
+                this.statusEl.className = `status ${type}`;
+                this.statusEl.textContent = text;
+            }
+        }
+        
+        // Initialize chat when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new MordzixChat();
+        });
+    </script>
+</body>
+</html>

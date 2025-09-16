@@ -1,0 +1,39 @@
+# Safari Mobile Optimized Requirements
+# Podstawowe FastAPI i WebSocket
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+websockets==12.0
+python-multipart==0.0.9
+
+# HTTP i networking
+requests==2.32.3
+aiohttp==3.10.10
+httpx==0.27.2
+
+# File handling
+aiofiles==24.1.0
+python-docx==1.1.2
+PyPDF2==3.0.1
+pdfplumber==0.11.4
+pillow==10.4.0
+
+# Data processing
+beautifulsoup4==4.12.3
+lxml==5.3.0
+python-dotenv==1.0.1
+
+# LLM integration
+openai>=1.30.0,<2.0.0
+
+# Database
+sqlite-utils==3.37
+
+# Development
+mypy==1.10.0
+black==24.8.0
+isort==5.13.2
+ruff==0.6.9
+
+# Optional performance boost
+ujson==5.10.0
+orjson==3.10.7
