@@ -1,57 +1,41 @@
 #!/bin/bash
-set -e
 
-echo "=== [0] Python 3.11 jako domyślny ==="
-python3 --version
+# Przejdź do katalogu roboczego, jeśli skrypt jest uruchamiany z innego miejsca
+cd "$(dirname "$0")" || exit
 
-# Sprawdź czy jesteśmy na RunPod
-if [ -n "${RUNPOD_PERSIST_DIR}" ] && [ -d "${RUNPOD_PERSIST_DIR}" ]; then
-    echo "=== RunPod Environment Detected ==="
-    echo "RUNPOD_PERSIST_DIR: ${RUNPOD_PERSIST_DIR}"
-    mkdir -p "${RUNPOD_PERSIST_DIR}/data"
-    export USE_RUNPOD=True
-    echo "USE_RUNPOD ustawione na: ${USE_RUNPOD}"
-else
-    echo "=== Local Environment ==="
-    export USE_RUNPOD=False
+echo "--- 🚀 Konfiguracja środowiska wirtualnego ---"
+if [ ! -d ".venv" ]; then
+    echo "Tworzenie .venv..."
+    python3 -m venv .venv
 fi
+source .venv/bin/activate
 
-echo "=== [1] Instalacja braków (pip + node) ==="
-pip install --upgrade pip setuptools wheel
-pip install black isort
-pip install -r /workspace/a/requirements.txt || true
-cd /workspace/a/frontend && npm install && cd ..
+echo "--- 📦 Instalacja zależności ---"
+pip install --upgrade pip > /dev/null
+echo "Instalowanie z requirements.txt..."
+pip install -r requirements.txt
 
-echo "=== [2] Auto-fix składni w .py ==="
-find /workspace/a -name "*.py" -exec sed -i 's/„/"/g; s/”/"/g; s/–/-/g; s/…/.../g' {} \;
+echo "Instalowanie dodatkowych pakietów (LangChain, AI, Pamięć)..."
+pip install langchain langchain-openai openai sentence-transformers scikit-learn networkx uvicorn
 
-echo "=== [3] Formatowanie kodu ==="
-isort /workspace/a || true
-black /workspace/a || true
+echo "--- 🌐 Tworzenie plików frontendu ---"
+mkdir -p static
 
-echo "=== [4] Build frontu ==="
-cd /workspace/a/frontend
-npm run build || true
-cd /workspace/a
+cat > static/index.html << 'EOF'
+<!DOCTYPE html><html><head><title>Mordzix Server</title></head>
+<body style="font-family:Arial;background:#1a1a1a;color:white;text-align:center;padding-top:50px;">
+<h1>🧠 Mordzix Działa</h1><p><a href="/mordzix" style="color:#0af;">Przejdź do Chatu</a></p>
+</body></html>
+EOF
 
-# Upewnij się, że katalogi istnieją
-echo "=== [5] Inicjalizacja katalogów danych ==="
-mkdir -p data/mem
-mkdir -p data/conversations
-mkdir -p data/inbox
+cat > static/mordzix.html << 'EOF'
+<!DOCTYPE html><html><head><title>Mordzix Chat</title><style>body{font-family:Arial;background:#111;color:#eee;display:flex;flex-direction:column;height:95vh;margin:0;padding:10px;}#chat{flex-grow:1;overflow-y:auto;border:1px solid #444;padding:10px;margin-bottom:10px;}#input-area{display:flex;gap:10px;}input{flex-grow:1;padding:10px;background:#333;color:#eee;border:1px solid #555;}button{padding:10px 20px;background:#06c;color:white;border:none;cursor:pointer;}</style></head><body><div id="chat"></div><div id="input-area"><input id="input" placeholder="Napisz..."><button id="send">Wyślij</button></div><script>const chat=document.getElementById("chat"),input=document.getElementById("input"),send=document.getElementById("send");const add=(m,s)=>{const p=document.createElement("p");p.innerHTML=`<strong>${s}:</strong> ${m}`;chat.appendChild(p);chat.scrollTop=chat.scrollHeight;};send.onclick=async()=>{const m=input.value;if(!m)return;add(m,"Ty");input.value="";try{const r=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:m,mode:"mordzix"})}),d=await r.json();add(d.response||"Błąd","Mordzix")}catch(e){add("Błąd połączenia: "+e.message,"System")}};input.onkeypress=e=>{if(e.key==="Enter")send.click()};add("System pamięci gotowy.","Mordzix");</script></body></html>
+EOF
 
-# Stosuj zmienne środowiskowe z env_patch.sh jeśli istnieje
-if [ -f "env_patch.sh" ]; then
-    echo "=== [6] Stosowanie zmiennych środowiskowych z env_patch.sh ==="
-    source env_patch.sh
-fi
-
-echo "=== [7] Restart backend na :5959 ==="
-pkill -f "uvicorn main:app" || true
-nohup uvicorn main:app --host 0.0.0.0 --port 5959 --reload > backend.log 2>&1 &
-
+echo "--- 🛑 Zatrzymywanie starych procesów serwera ---"
+pkill -f uvicorn || true
 sleep 2
-echo "Health:" 
-curl -s http://127.0.0.1:5959/health || echo "Backend nie odpowiada"
 
-echo "=== DONE ==="
+echo "--- ▶️ Uruchamianie serwera Mordzix ---"
+echo "Serwer będzie dostępny pod adresem http://<TWÓJ_IP_RUNPOD>:5959"
+python -m uvicorn main:app --host 0.0.0.0 --port 5959
