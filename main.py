@@ -111,7 +111,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Inicjalizacja pamięci i sprawdzenie czy wymaga załadowania danych początkowych
 mem = memory.get_memory()
-if not mem.get_profile("Użytkownik"):
+if not mem.get_profile():
     print("💡 Inicjalizacja nowej pamięci...")
 
     # Dodaj podstawowy profil użytkownika
@@ -237,7 +237,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Inicjalizacja pamięci i sprawdzenie czy wymaga załadowania danych początkowych
 mem = memory.get_memory()
-if not mem.get_profile("Użytkownik"):
+if not mem.get_profile():
     print("💡 Inicjalizacja nowej pamięci...")
 
     # Dodaj podstawowy profil użytkownika
@@ -363,7 +363,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Inicjalizacja pamięci i sprawdzenie czy wymaga załadowania danych początkowych
 mem = memory.get_memory()
-if not mem.get_profile("Użytkownik"):
+if not mem.get_profile():
     print("💡 Inicjalizacja nowej pamięci...")
 
     # Dodaj podstawowy profil użytkownika

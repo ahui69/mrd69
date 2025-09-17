@@ -23,19 +23,6 @@ mkdir -p data
 touch data/memory.jsonl
 echo "Utworzono pusty plik data/memory.jsonl (jeśli nie istniał)."
 
-echo "--- 🏗️ Budowanie front-endu ---"
-# Sprawdź, czy jest zainstalowany npm, jeśli nie, spróbuj zainstalować
-if ! command -v npm &> /dev/null
-then
-    echo "npm nie znaleziony, próba instalacji nodejs..."
-    # To zadziała na systemach bazujących na Debianie/Ubuntu
-    apt-get update && apt-get install -y nodejs npm
-fi
-echo "Instalowanie zależności front-endu (npm install)..."
-npm install
-echo "Budowanie front-endu (npm run build)..."
-npm run build
-
 echo "--- 🌐 Tworzenie plików frontendu ---"
 mkdir -p static
 
