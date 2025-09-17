@@ -12,8 +12,8 @@ source .venv/bin/activate
 
 echo "--- 📦 Instalacja zależności ---"
 pip install --upgrade pip > /dev/null
-echo "Instalowanie z requirements.txt..."
-pip install -r requirements.txt
+echo "Instalowanie zależności z pyproject.toml..."
+pip install .
 
 echo "Instalowanie dodatkowych pakietów (LangChain, AI, Pamięć)..."
 pip install langchain langchain-openai openai sentence-transformers scikit-learn networkx uvicorn
