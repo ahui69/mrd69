@@ -458,8 +458,9 @@ if config.USE_RUNPOD:
 
     atexit.register(cleanup)
 
-# Inicjalizacja pamięci
-_initialize_memory()
+# Jednorazowe ładowanie wiedzy z memory.jsonl przy starcie aplikacji
+load_knowledge_from_jsonl("data/memory.jsonl")
+
 
 # === KRYTYCZNA INICJALIZACJA SYSTEMU NIEZAWODNOŚCI ===
 reliable_system = _initialize_reliability_system()
