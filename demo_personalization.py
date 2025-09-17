@@ -3,13 +3,11 @@
 Demo pełnego systemu personalizacji - tworzenie profilu, nauka, generowanie planów.
 """
 
-import json
 from travelguide import (
-    TravelerProfile,
-    load_traveler_profile,
-    save_traveler_profile,
     generate_personalized_narrative,
     get_contextual_recommendations,
+    load_traveler_profile,
+    save_traveler_profile,
     update_profile_from_trip,
 )
 
@@ -172,7 +170,7 @@ def demo_full_personalization():
     update_profile_from_trip(profile, trip_data)
 
     print(f"   Po podróży: muzea={profile.likes_museums:.2f}, natura={profile.likes_nature:.2f}")
-    print(f"   🎯 System nauczył się, że Anna bardziej docenia naturę!")
+    print("   🎯 System nauczył się, że Anna bardziej docenia naturę!")
 
     # 6. Final test z nowym profilem
     print("\n🔄 NOWE REKOMENDACJE PO NAUCE:")
@@ -185,10 +183,10 @@ def demo_full_personalization():
         score = rec.get("personalized_score", 0)
         print(f"      {i}. {rec['name']} (score: {score:.2f})")
 
-    print(f"\n✨ PODSUMOWANIE:")
+    print("\n✨ PODSUMOWANIE:")
     print(f"   📊 Profil został zaktualizowany na podstawie {profile.trips_count} podróży")
     print(f"   🗺️ Odwiedzone miasta: {', '.join(profile.visited_cities[-3:])}")
-    print(f"   🎯 System adaptuje się do rzeczywistych preferencji użytkownika")
+    print("   🎯 System adaptuje się do rzeczywistych preferencji użytkownika")
 
     # Pokaż końcowy profil
     print(f"\n💾 Końcowy profil zapisany w: out/travel/profiles/{profile.user_id}.json")

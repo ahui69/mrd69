@@ -5,7 +5,7 @@ MORDZIX PRODUCTION SERVER - Production Ready FastAPI Server
 
 import json
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 # Import Mordzix Core
-from mordzix_core import mordzix_engine, crypto_integration
+from mordzix_core import mordzix_engine
 
 app = FastAPI(title="Mordzix Production")
 
@@ -54,11 +54,11 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Models
 class MordzixChatRequest(BaseModel):
-    thread_id: Optional[str] = None
+    thread_id: str | None = None
     user_id: str
     content: str
     message_type: str = "text"
-    attachments: Optional[List[Dict[str, Any]]] = None
+    attachments: list[dict[str, Any]] | None = None
 
 
 class MordzixThreadRequest(BaseModel):

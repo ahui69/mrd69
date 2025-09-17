@@ -18,6 +18,11 @@ pip install -r requirements.txt
 echo "Instalowanie dodatkowych pakietów (LangChain, AI, Pamięć)..."
 pip install langchain langchain-openai openai sentence-transformers scikit-learn networkx uvicorn
 
+echo "--- 💾 Przygotowanie danych ---"
+mkdir -p data
+touch data/memory.jsonl
+echo "Utworzono pusty plik data/memory.jsonl (jeśli nie istniał)."
+
 echo "--- 🏗️ Budowanie front-endu ---"
 # Sprawdź, czy jest zainstalowany npm, jeśli nie, spróbuj zainstalować
 if ! command -v npm &> /dev/null

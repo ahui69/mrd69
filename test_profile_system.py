@@ -5,14 +5,13 @@ Demonstracja funkcji profilu podróżnika bez zależności od zewnętrznych API.
 """
 
 import sys
-import json
+
 from travelguide import (
-    TravelerProfile,
-    load_traveler_profile,
-    save_traveler_profile,
+    _categorize_attractions,
     generate_personalized_narrative,
     get_contextual_recommendations,
-    _categorize_attractions,
+    load_traveler_profile,
+    save_traveler_profile,
     update_profile_from_trip,
 )
 

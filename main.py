@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import atexit
+import json
 import time
 import traceback
-import json
 from collections import defaultdict, deque
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fastapi import FastAPI, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,6 +20,8 @@ import crypto_advisor_full
 import file_client
 import kimi_client
 import memory
+
+# === MORDZIX CORE - NAJLEPSZA PLATFORMA AI ===
 import programista
 import psychika
 import runpod_sync
@@ -27,18 +29,12 @@ import search_client
 import travelguide
 import writing_all_pro
 
-# === MORDZIX CORE - NAJLEPSZA PLATFORMA AI ===
-import mordzix_core
-from mordzix_core import mordzix_engine, crypto_integration
-
 # === ZAAWANSOWANY SYSTEM PAMIĘCI ===
 from memory import (
-    get_advanced_memory,
     ContextType,
-    MoodType,
-    TimelineEntry,
-    PersonProfile,
+    get_advanced_memory,
 )
+from mordzix_core import crypto_integration, mordzix_engine
 
 # === SYSTEM NIEZAWODNOŚCI - ZAWSZE AKTYWNY ===
 from reliability_core import get_reliable_system, reliable_operation, require_reliability_check
@@ -114,33 +110,308 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 # Inicjalizacja pamięci i sprawdzenie czy wymaga załadowania danych początkowych
-def _initialize_memory():
-    mem = memory.get_memory()
-    stats = mem.stats()
+mem = memory.get_memory()
+if not mem.get_profile("Użytkownik"):
+    print("💡 Inicjalizacja nowej pamięci...")
 
-    # Jeśli baza jest pusta, zainicjuj ją przykładowymi danymi
-    if stats.get("facts", 0) < 10:
-        print("Baza pamięci jest pusta, inicjalizacja przykładowymi danymi...")
+    # Dodaj podstawowy profil użytkownika
+    mem.set_profile_many({"name": "Użytkownik", "version": "1.0.0", "created_at": time.time()})
 
-        # Dodaj podstawowy profil użytkownika
-        mem.set_profile_many({"name": "Użytkownik", "version": "1.0.0", "created_at": time.time()})
+    # Dodaj kilka podstawowych faktów
+    mem.add_fact(
+        "To jest nowa instalacja asystenta z pamięcią.", conf=0.9, tags=["system", "init"]
+    )
+    mem.add_fact(
+        "Pamięć długoterminowa została zainicjowana.", conf=0.9, tags=["system", "init"]
+    )
 
-        # Dodaj kilka podstawowych faktów
-        mem.add_fact(
-            "To jest nowa instalacja asystenta z pamięcią.", conf=0.9, tags=["system", "init"]
+    # Dodaj przykładowy cel
+    mem.add_goal(
+        "Pomaganie użytkownikowi najlepiej jak to możliwe.",
+        priority=1.0,
+        tags=["system", "goal"],
+    )
+
+    print("Inicjalizacja pamięci zakończona.")
+
+
+def load_knowledge_from_jsonl(file_path: str):
+    """Ładuje wiedzę z pliku JSONL do pamięci LTM."""
+    print(f"🧠 Ładowanie wiedzy z pliku {file_path}...")
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            count = 0
+            for line in f:
+                try:
+                    data = json.loads(line)
+                    text = data.get("text")
+                    tags = data.get("tags", [])
+                    if text:
+                        mem.add_fact(text, conf=0.95, tags=["wiedza_jsonl"] + tags)
+                        count += 1
+                except json.JSONDecodeError:
+                    print(f"⚠️ Ostrzeżenie: Pominięto nieprawidłową linię JSON w {file_path}")
+            print(f"✅ Załadowano {count} faktów z {file_path}.")
+    except FileNotFoundError:
+        print(f"⚠️ Ostrzeżenie: Plik wiedzy {file_path} nie został znaleziony. Pomiń.")
+    except Exception as e:
+        print(f"❌ Błąd podczas ładowania wiedzy z {file_path}: {e}")
+
+
+# Jednorazowe ładowanie wiedzy z memory.jsonl przy starcie aplikacji
+load_knowledge_from_jsonl("data/memory.jsonl")
+
+
+# === SYSTEM NIEZAWODNOŚCI - ZAWSZE AKTYWNY ===
+from reliability_core import get_reliable_system, reliable_operation, require_reliability_check
+
+
+# === Rate Limiting ===
+class RateLimiter:
+    def __init__(self):
+        # Store request timestamps per IP
+        self.requests: dict[str, deque[float]] = defaultdict(lambda: deque())
+        self.limits = {
+            "default": (60, 60),  # 60 requests per 60 seconds
+            "/run": (10, 60),  # 10 requests per 60 seconds for /run
+            "/chat": (20, 60),  # 20 requests per 60 seconds for chat
+        }
+
+    def is_allowed(self, client_ip: str, path: str) -> bool:
+        now = time.time()
+
+        # Determine rate limit for this path
+        limit_requests, limit_window = self.limits.get(path, self.limits["default"])
+
+        # Clean old requests outside the window
+        client_requests = self.requests[client_ip]
+        while client_requests and client_requests[0] < now - limit_window:
+            client_requests.popleft()
+
+        # Check if within limit
+        if len(client_requests) >= limit_requests:
+            return False
+
+        # Add current request
+        client_requests.append(now)
+        return True
+
+
+rate_limiter = RateLimiter()
+
+# === FastAPI setup ===
+app = FastAPI(title=config.APP_TITLE)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# === INICJALIZACJA ZAAWANSOWANEGO SYSTEMU PAMIĘCI ===
+advanced_memory = get_advanced_memory()
+
+
+# Rate limiting middleware
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    client_ip = request.client.host
+    path = request.url.path
+
+    # Skip rate limiting for static files and health checks
+    if path.startswith("/static/") or path == "/health":
+        return await call_next(request)
+
+    if not rate_limiter.is_allowed(client_ip, path):
+        return JSONResponse(
+            status_code=429, content={"error": "Rate limit exceeded. Please try again later."}
         )
-        mem.add_fact(
-            "Pamięć długoterminowa została zainicjowana.", conf=0.9, tags=["system", "init"]
+
+    return await call_next(request)
+
+
+# Serwowanie plików statycznych pod /static oraz root index.html
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+# Inicjalizacja pamięci i sprawdzenie czy wymaga załadowania danych początkowych
+mem = memory.get_memory()
+if not mem.get_profile("Użytkownik"):
+    print("💡 Inicjalizacja nowej pamięci...")
+
+    # Dodaj podstawowy profil użytkownika
+    mem.set_profile_many({"name": "Użytkownik", "version": "1.0.0", "created_at": time.time()})
+
+    # Dodaj kilka podstawowych faktów
+    mem.add_fact(
+        "To jest nowa instalacja asystenta z pamięcią.", conf=0.9, tags=["system", "init"]
+    )
+    mem.add_fact(
+        "Pamięć długoterminowa została zainicjowana.", conf=0.9, tags=["system", "init"]
+    )
+
+    # Dodaj przykładowy cel
+    mem.add_goal(
+        "Pomaganie użytkownikowi najlepiej jak to możliwe.",
+        priority=1.0,
+        tags=["system", "goal"],
+    )
+
+    print("Inicjalizacja pamięci zakończona.")
+
+
+def load_knowledge_from_jsonl(file_path: str):
+    """Ładuje wiedzę z pliku JSONL do pamięci LTM."""
+    print(f"🧠 Ładowanie wiedzy z pliku {file_path}...")
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            count = 0
+            for line in f:
+                try:
+                    data = json.loads(line)
+                    text = data.get("text")
+                    tags = data.get("tags", [])
+                    if text:
+                        mem.add_fact(text, conf=0.95, tags=["wiedza_jsonl"] + tags)
+                        count += 1
+                except json.JSONDecodeError:
+                    print(f"⚠️ Ostrzeżenie: Pominięto nieprawidłową linię JSON w {file_path}")
+            print(f"✅ Załadowano {count} faktów z {file_path}.")
+    except FileNotFoundError:
+        print(f"⚠️ Ostrzeżenie: Plik wiedzy {file_path} nie został znaleziony. Pomiń.")
+    except Exception as e:
+        print(f"❌ Błąd podczas ładowania wiedzy z {file_path}: {e}")
+
+
+# Jednorazowe ładowanie wiedzy z memory.jsonl przy starcie aplikacji
+load_knowledge_from_jsonl("data/memory.jsonl")
+
+
+# === SYSTEM NIEZAWODNOŚCI - ZAWSZE AKTYWNY ===
+from reliability_core import get_reliable_system, reliable_operation, require_reliability_check
+
+
+# === Rate Limiting ===
+class RateLimiter:
+    def __init__(self):
+        # Store request timestamps per IP
+        self.requests: dict[str, deque[float]] = defaultdict(lambda: deque())
+        self.limits = {
+            "default": (60, 60),  # 60 requests per 60 seconds
+            "/run": (10, 60),  # 10 requests per 60 seconds for /run
+            "/chat": (20, 60),  # 20 requests per 60 seconds for chat
+        }
+
+    def is_allowed(self, client_ip: str, path: str) -> bool:
+        now = time.time()
+
+        # Determine rate limit for this path
+        limit_requests, limit_window = self.limits.get(path, self.limits["default"])
+
+        # Clean old requests outside the window
+        client_requests = self.requests[client_ip]
+        while client_requests and client_requests[0] < now - limit_window:
+            client_requests.popleft()
+
+        # Check if within limit
+        if len(client_requests) >= limit_requests:
+            return False
+
+        # Add current request
+        client_requests.append(now)
+        return True
+
+
+rate_limiter = RateLimiter()
+
+# === FastAPI setup ===
+app = FastAPI(title=config.APP_TITLE)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# === INICJALIZACJA ZAAWANSOWANEGO SYSTEMU PAMIĘCI ===
+advanced_memory = get_advanced_memory()
+
+
+# Rate limiting middleware
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    client_ip = request.client.host
+    path = request.url.path
+
+    # Skip rate limiting for static files and health checks
+    if path.startswith("/static/") or path == "/health":
+        return await call_next(request)
+
+    if not rate_limiter.is_allowed(client_ip, path):
+        return JSONResponse(
+            status_code=429, content={"error": "Rate limit exceeded. Please try again later."}
         )
 
-        # Dodaj przykładowy cel
-        mem.add_goal(
-            "Pomaganie użytkownikowi najlepiej jak to możliwe.",
-            priority=1.0,
-            tags=["system", "goal"],
-        )
+    return await call_next(request)
 
-        print("Inicjalizacja pamięci zakończona.")
+
+# Serwowanie plików statycznych pod /static oraz root index.html
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+# Inicjalizacja pamięci i sprawdzenie czy wymaga załadowania danych początkowych
+mem = memory.get_memory()
+if not mem.get_profile("Użytkownik"):
+    print("💡 Inicjalizacja nowej pamięci...")
+
+    # Dodaj podstawowy profil użytkownika
+    mem.set_profile_many({"name": "Użytkownik", "version": "1.0.0", "created_at": time.time()})
+
+    # Dodaj kilka podstawowych faktów
+    mem.add_fact(
+        "To jest nowa instalacja asystenta z pamięcią.", conf=0.9, tags=["system", "init"]
+    )
+    mem.add_fact(
+        "Pamięć długoterminowa została zainicjowana.", conf=0.9, tags=["system", "init"]
+    )
+
+    # Dodaj przykładowy cel
+    mem.add_goal(
+        "Pomaganie użytkownikowi najlepiej jak to możliwe.",
+        priority=1.0,
+        tags=["system", "goal"],
+    )
+
+    print("Inicjalizacja pamięci zakończona.")
+
+
+def load_knowledge_from_jsonl(file_path: str):
+    """Ładuje wiedzę z pliku JSONL do pamięci LTM."""
+    print(f"🧠 Ładowanie wiedzy z pliku {file_path}...")
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            count = 0
+            for line in f:
+                try:
+                    data = json.loads(line)
+                    text = data.get("text")
+                    tags = data.get("tags", [])
+                    if text:
+                        mem.add_fact(text, conf=0.95, tags=["wiedza_jsonl"] + tags)
+                        count += 1
+                except json.JSONDecodeError:
+                    print(f"⚠️ Ostrzeżenie: Pominięto nieprawidłową linię JSON w {file_path}")
+            print(f"✅ Załadowano {count} faktów z {file_path}.")
+    except FileNotFoundError:
+        print(f"⚠️ Ostrzeżenie: Plik wiedzy {file_path} nie został znaleziony. Pomiń.")
+    except Exception as e:
+        print(f"❌ Błąd podczas ładowania wiedzy z {file_path}: {e}")
+
+
+# Jednorazowe ładowanie wiedzy z memory.jsonl przy starcie aplikacji
+load_knowledge_from_jsonl("data/memory.jsonl")
 
 
 # === INICJALIZACJA SYSTEMU NIEZAWODNOŚCI ===
@@ -868,11 +1139,11 @@ async def load_knowledge_from_file(data: KnowledgeFileData):
 
 # === MORDZIX API MODELS ===
 class MordzixChatRequest(BaseModel):
-    thread_id: Optional[str] = None
+    thread_id: str | None = None
     user_id: str
     content: str
     message_type: str = "text"
-    attachments: Optional[List[Dict[str, Any]]] = None
+    attachments: list[dict[str, Any]] | None = None
 
 
 class MordzixThreadRequest(BaseModel):
@@ -1089,9 +1360,7 @@ async def get_crypto_score_mordzix(token_id: str):
 
 
 @app.get("/memory/timeline")
-async def get_timeline(
-    date_from: Optional[str] = None, date_to: Optional[str] = None, limit: int = 50
-):
+async def get_timeline(date_from: str | None = None, date_to: str | None = None, limit: int = 50):
     """Pobiera timeline interakcji"""
     try:
         entries = advanced_memory.get_timeline_entries(
@@ -1122,7 +1391,7 @@ async def search_timeline(q: str, limit: int = 10):
 
 
 @app.post("/memory/timeline/daily-summary")
-async def create_daily_summary(date: Optional[str] = None):
+async def create_daily_summary(date: str | None = None):
     """Tworzy automatyczne podsumowanie dnia"""
     try:
         entry = advanced_memory.create_daily_summary(date)
@@ -1222,7 +1491,7 @@ async def create_reflection(session_summary: str):
 
 
 @app.get("/memory/files")
-async def search_files(q: str = "", file_type: Optional[str] = None):
+async def search_files(q: str = "", file_type: str | None = None):
     """Wyszukuje w pamięci plików"""
     try:
         files = advanced_memory.search_file_memory(q, file_type)
@@ -1243,7 +1512,7 @@ async def save_file_memory(
     file_type: str,
     description: str = "",
     file_path: str = "",
-    tags: Optional[List[str]] = None,
+    tags: list[str] | None = None,
 ):
     """Zapisuje pamięć o pliku"""
     try:

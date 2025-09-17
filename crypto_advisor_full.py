@@ -56,9 +56,9 @@ import os
 import re
 import threading
 import time
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, List, Dict
+from typing import Any
 
 import requests
 from dotenv import load_dotenv
@@ -1194,8 +1194,8 @@ class Portfolio:
 
     user_id: str
     name: str
-    addresses: List[str]  # adresy ETH/BSC/itp.
-    positions: List[PortfolioPosition]
+    addresses: list[str]  # adresy ETH/BSC/itp.
+    positions: list[PortfolioPosition]
     total_value_usd: float = 0.0
     total_value_pln: float = 0.0
     last_scan: str = ""
@@ -1208,7 +1208,7 @@ def load_portfolio(user_id: str) -> Portfolio:
 
     if portfolio_file.exists():
         try:
-            with open(portfolio_file, "r", encoding="utf-8") as f:
+            with open(portfolio_file, encoding="utf-8") as f:
                 data = json.load(f)
             return Portfolio(**data)
         except Exception as e:
@@ -1278,7 +1278,7 @@ def scan_portfolio_balances(portfolio: Portfolio) -> Portfolio:
     return portfolio
 
 
-def portfolio_performance_report(portfolio: Portfolio) -> Dict[str, Any]:
+def portfolio_performance_report(portfolio: Portfolio) -> dict[str, Any]:
     """Generuj raport performance portfolio."""
     if not portfolio.positions:
         return {"error": "Portfolio is empty"}
@@ -1319,7 +1319,7 @@ def portfolio_performance_report(portfolio: Portfolio) -> Dict[str, Any]:
 
 
 # ── Token Scoring System ──────────────────────────────────────────────────────
-def calculate_token_score(token_id: str, vs: str = "usd") -> Dict[str, Any]:
+def calculate_token_score(token_id: str, vs: str = "usd") -> dict[str, Any]:
     """
     Oblicz composite score dla tokena na podstawie:
     - Płynności (volume, market cap)
@@ -1433,7 +1433,7 @@ def simple_sma_strategy_backtest(
             raise ValueError(f"Not enough data: {len(prices)} < {long_period}")
 
         # Calculate SMAs
-        def sma(data: List[float], period: int) -> List[float]:
+        def sma(data: list[float], period: int) -> list[float]:
             return [sum(data[i - period : i]) / period for i in range(period, len(data) + 1)]
 
         sma_short = sma(prices, short_period)
@@ -1531,7 +1531,7 @@ def simple_sma_strategy_backtest(
             sharpe_ratio=sharpe_ratio,
         )
 
-    except Exception as e:
+    except Exception:
         # Return failed backtest
         return BacktestResult(
             strategy_name=f"SMA({short_period},{long_period})",

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 images_client.py — v4.0 MULTI-ENGINE
 
@@ -47,7 +46,7 @@ import mimetypes
 import os
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import requests
 
@@ -145,7 +144,7 @@ def _save_meta(fpath: Path, prompt: str, model: str, user: str) -> None:
 # ──────────────────────────────────────────────
 # PROVIDER: OpenAI
 # ──────────────────────────────────────────────
-def _openai_generate(prompt: str, size: str, user: str) -> Optional[str]:
+def _openai_generate(prompt: str, size: str, user: str) -> str | None:
     if not OPENAI_KEY:
         return None
     url = f"{OPENAI_BASE}/images/generations"
@@ -168,7 +167,7 @@ def _openai_generate(prompt: str, size: str, user: str) -> Optional[str]:
     return None
 
 
-def _openai_edit(image_path: str, prompt: str, user: str) -> Optional[str]:
+def _openai_edit(image_path: str, prompt: str, user: str) -> str | None:
     if not OPENAI_KEY:
         return None
     url = f"{OPENAI_BASE}/images/edits"
@@ -190,7 +189,7 @@ def _openai_edit(image_path: str, prompt: str, user: str) -> Optional[str]:
 # ──────────────────────────────────────────────
 # PROVIDER: Stability.ai
 # ──────────────────────────────────────────────
-def _stability_generate(prompt: str, size: str, user: str) -> Optional[str]:
+def _stability_generate(prompt: str, size: str, user: str) -> str | None:
     if not STABILITY_KEY:
         return None
     url = f"{STABILITY_BASE}/generation/stable-diffusion-v1-6/text-to-image"
@@ -215,7 +214,7 @@ def _stability_generate(prompt: str, size: str, user: str) -> Optional[str]:
 # ──────────────────────────────────────────────
 # PROVIDER: Replicate (async polling)
 # ──────────────────────────────────────────────
-def _replicate_generate(prompt: str, size: str, user: str) -> Optional[str]:
+def _replicate_generate(prompt: str, size: str, user: str) -> str | None:
     if not REPLICATE_KEY:
         return None
     headers = {"Authorization": f"Token {REPLICATE_KEY}", "Content-Type": "application/json"}
@@ -252,7 +251,7 @@ def _replicate_generate(prompt: str, size: str, user: str) -> Optional[str]:
 # ──────────────────────────────────────────────
 # PROVIDER: AUTOMATIC1111 (Stable Diffusion WebUI)
 # ──────────────────────────────────────────────
-def _a1111_generate(prompt: str, size: str, user: str) -> Optional[str]:
+def _a1111_generate(prompt: str, size: str, user: str) -> str | None:
     if not A1111_BASE:
         return None
     url = f"{A1111_BASE}/sdapi/v1/txt2img"
@@ -273,7 +272,7 @@ def _a1111_generate(prompt: str, size: str, user: str) -> Optional[str]:
     return None
 
 
-def _a1111_img2img(image_path: str, prompt: str, user: str) -> Optional[str]:
+def _a1111_img2img(image_path: str, prompt: str, user: str) -> str | None:
     if not A1111_BASE:
         return None
     url = f"{A1111_BASE}/sdapi/v1/img2img"
@@ -295,7 +294,7 @@ def _a1111_img2img(image_path: str, prompt: str, user: str) -> Optional[str]:
 # ──────────────────────────────────────────────
 # PROVIDER: Hugging Face Inference API
 # ──────────────────────────────────────────────
-def _hf_generate(prompt: str, size: str, user: str) -> Optional[str]:
+def _hf_generate(prompt: str, size: str, user: str) -> str | None:
     if not HF_TOKEN:
         return None
     url = f"https://api-inference.huggingface.co/models/{HF_T2I_MODEL}"
@@ -317,7 +316,7 @@ def _hf_generate(prompt: str, size: str, user: str) -> Optional[str]:
     return None
 
 
-def _hf_caption(image_path: str) -> Optional[str]:
+def _hf_caption(image_path: str) -> str | None:
     if not HF_TOKEN:
         return None
     url = f"https://api-inference.huggingface.co/models/{HF_CAPTION_MODEL}"
@@ -339,7 +338,7 @@ def _hf_caption(image_path: str) -> Optional[str]:
 # ──────────────────────────────────────────────
 # PROVIDER: ComfyUI (bardzo uproszczony trigger)
 # ──────────────────────────────────────────────
-def _comfyui_generate(prompt: str, size: str, user: str) -> Optional[str]:
+def _comfyui_generate(prompt: str, size: str, user: str) -> str | None:
     if not COMFYUI_BASE:
         return None
     # Minimal: zakładamy gotowy workflow na serwerze (tu tylko ping)
@@ -356,7 +355,7 @@ def _comfyui_generate(prompt: str, size: str, user: str) -> Optional[str]:
 # ──────────────────────────────────────────────
 # PUBLIC API: GENERATE / EDIT / ANALYZE / LIST / FEEDBACK
 # ──────────────────────────────────────────────
-def generate_image(prompt: str, size: str = DEFAULT_SIZE, user: str = "default") -> Dict[str, Any]:
+def generate_image(prompt: str, size: str = DEFAULT_SIZE, user: str = "default") -> dict[str, Any]:
     """Próbuje providerów w kolejności IMG_PROVIDERS aż do skutku."""
     chain = {
         "openai": lambda: _openai_generate(prompt, size, user),
@@ -381,7 +380,7 @@ def generate_image(prompt: str, size: str = DEFAULT_SIZE, user: str = "default")
     return {"ok": False, "error": last_err or "brak dostawcy"}
 
 
-def edit_image(image_path: str, prompt: str, user: str = "default") -> Dict[str, Any]:
+def edit_image(image_path: str, prompt: str, user: str = "default") -> dict[str, Any]:
     """Edycja istniejącego obrazu (priorytet: A1111 img2img → OpenAI edits)."""
     path = _a1111_img2img(image_path, prompt, user) or _openai_edit(image_path, prompt, user)
     if not path:
@@ -389,7 +388,7 @@ def edit_image(image_path: str, prompt: str, user: str = "default") -> Dict[str,
     return {"ok": True, "path": path}
 
 
-def analyze_image(image_path: str) -> Dict[str, Any]:
+def analyze_image(image_path: str) -> dict[str, Any]:
     """Opis obrazka (HF BLIP caption jeśli dostępny, inaczej stub)."""
     cap = _hf_caption(image_path)
     if cap:
@@ -400,7 +399,7 @@ def analyze_image(image_path: str) -> Dict[str, Any]:
     }
 
 
-def list_images(user: str = "default") -> List[str]:
+def list_images(user: str = "default") -> list[str]:
     """Lista ścieżek obrazów użytkownika."""
     return sorted(
         [
@@ -411,12 +410,12 @@ def list_images(user: str = "default") -> List[str]:
     )
 
 
-def feedback(image_path: str, rating: int, tags: List[str] | None = None) -> Dict[str, Any]:
+def feedback(image_path: str, rating: int, tags: list[str] | None = None) -> dict[str, Any]:
     """Zapis opinii do meta.json obok pliku."""
     meta_path = f"{image_path}.json"
     if not os.path.exists(meta_path):
         return {"ok": False, "error": "brak meta"}
-    with open(meta_path, "r", encoding="utf-8") as f:
+    with open(meta_path, encoding="utf-8") as f:
         meta = json.load(f)
     meta["feedback"] = {"rating": int(rating), "tags": tags or [], "ts": _ts()}
     with open(meta_path, "w", encoding="utf-8") as f:
@@ -427,7 +426,7 @@ def feedback(image_path: str, rating: int, tags: List[str] | None = None) -> Dic
 # ──────────────────────────────────────────────
 # UTILS: UPSCALE + REMOVE BG
 # ──────────────────────────────────────────────
-def upscale_image(image_path: str, user: str = "default") -> Dict[str, Any]:
+def upscale_image(image_path: str, user: str = "default") -> dict[str, Any]:
     """
     Upscale przez Replicate (Real-ESRGAN). Wymaga REPLICATE_KEY.
     """
@@ -466,7 +465,7 @@ def upscale_image(image_path: str, user: str = "default") -> Dict[str, Any]:
     return {"ok": False, "error": "unknown"}
 
 
-def remove_background(image_path: str, user: str = "default") -> Dict[str, Any]:
+def remove_background(image_path: str, user: str = "default") -> dict[str, Any]:
     """
     Remove BG przez Replicate (rembg). Wymaga REPLICATE_KEY.
     """

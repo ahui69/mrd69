@@ -2217,9 +2217,8 @@ Przykład:
 # ------------------------- ZAAWANSOWANY SYSTEM PAMIĘCI EPIZODYCZNEJ -------------------------
 
 import datetime
+from dataclasses import asdict, dataclass
 from enum import Enum
-from dataclasses import dataclass, asdict
-from typing import Dict, List, Union
 
 
 class MoodType(Enum):
@@ -2256,18 +2255,18 @@ class TimelineEntry:
     summary: str  # Szczegółowy opis co się działo
     context_type: ContextType
     mood: MoodType
-    participants: List[str]  # ["Mordo", "Papik", "AI"]
-    projects: List[str]  # ["winda-6kw", "mordzix-core"]
-    achievements: List[str]  # Co się udało
-    problems: List[str]  # Co nie wyszło
-    lessons_learned: List[str]  # Wnioski na przyszłość
-    files_worked_on: List[str]  # Pliki z którymi pracowaliśmy
-    code_snippets: List[str]  # Ważne kawałki kodu
-    decisions_made: List[str]  # Podjęte decyzje
-    next_actions: List[str]  # Co robić dalej
-    emotional_notes: List[str]  # Notatki o nastroju/tonie
-    prediction_patterns: List[str]  # Wzorce zachowań do przewidywania
-    related_timeline_ids: List[str]  # Powiązane dni/sesje
+    participants: list[str]  # ["Mordo", "Papik", "AI"]
+    projects: list[str]  # ["winda-6kw", "mordzix-core"]
+    achievements: list[str]  # Co się udało
+    problems: list[str]  # Co nie wyszło
+    lessons_learned: list[str]  # Wnioski na przyszłość
+    files_worked_on: list[str]  # Pliki z którymi pracowaliśmy
+    code_snippets: list[str]  # Ważne kawałki kodu
+    decisions_made: list[str]  # Podjęte decyzje
+    next_actions: list[str]  # Co robić dalej
+    emotional_notes: list[str]  # Notatki o nastroju/tonie
+    prediction_patterns: list[str]  # Wzorce zachowań do przewidywania
+    related_timeline_ids: list[str]  # Powiązane dni/sesje
     confidence_score: float = 0.8
 
     def to_dict(self) -> dict:
@@ -2295,14 +2294,14 @@ class PersonProfile:
     """Profil osoby w systemie relacji"""
 
     name: str
-    aliases: List[str]  # ["Mordo", "Boss", "Szef"]
+    aliases: list[str]  # ["Mordo", "Boss", "Szef"]
     role: str  # "user", "collaborator", "client"
-    expertise: List[str]  # ["python", "devops", "crypto"]
+    expertise: list[str]  # ["python", "devops", "crypto"]
     communication_style: str  # "direct", "detailed", "casual"
-    typical_requests: List[str]  # Typowe prośby tej osoby
-    mood_patterns: List[str]  # Wzorce nastrojów
+    typical_requests: list[str]  # Typowe prośby tej osoby
+    mood_patterns: list[str]  # Wzorce nastrojów
     preferred_tone: str  # Preferowany ton odpowiedzi
-    projects_involved: List[str]  # Projekty w których uczestniczy
+    projects_involved: list[str]  # Projekty w których uczestniczy
     last_interaction: str  # Data ostatniej interakcji
     relationship_strength: float = 0.5  # 0-1 siła relacji
 
@@ -2312,12 +2311,12 @@ class ContextMemory:
     """Pamięć kontekstowa dla różnych trybów"""
 
     context_type: ContextType
-    priority_facts: List[str]  # Fakty istotne w tym kontekście
-    preferred_tools: List[str]  # Preferowane narzędzia
-    common_patterns: List[str]  # Typowe wzorce w tym kontekście
-    success_strategies: List[str]  # Sprawdzone strategie
-    avoid_patterns: List[str]  # Czego unikać
-    typical_workflows: List[str]  # Typowe przepływy pracy
+    priority_facts: list[str]  # Fakty istotne w tym kontekście
+    preferred_tools: list[str]  # Preferowane narzędzia
+    common_patterns: list[str]  # Typowe wzorce w tym kontekście
+    success_strategies: list[str]  # Sprawdzone strategie
+    avoid_patterns: list[str]  # Czego unikać
+    typical_workflows: list[str]  # Typowe przepływy pracy
     last_used: str  # Kiedy ostatnio używany
     usage_count: int = 0
 
@@ -2330,8 +2329,8 @@ class PredictionPattern:
     predicted_action: str  # Przewidywana akcja
     confidence: float  # Pewność przewidywania
     success_rate: float  # Jak często to się sprawdza
-    context_conditions: List[str]  # W jakich warunkach działa
-    example_sequence: List[str]  # Przykładowa sekwencja
+    context_conditions: list[str]  # W jakich warunkach działa
+    example_sequence: list[str]  # Przykładowa sekwencja
 
 
 @dataclass
@@ -2340,13 +2339,13 @@ class SelfReflectionNote:
 
     date: str
     session_summary: str
-    what_worked: List[str]
-    what_failed: List[str]
-    user_feedback_signals: List[str]  # Sygnały od użytkownika
-    improvements_needed: List[str]
-    rules_to_remember: List[str]
-    strategy_adjustments: List[str]
-    next_session_goals: List[str]
+    what_worked: list[str]
+    what_failed: list[str]
+    user_feedback_signals: list[str]  # Sygnały od użytkownika
+    improvements_needed: list[str]
+    rules_to_remember: list[str]
+    strategy_adjustments: list[str]
+    next_session_goals: list[str]
     confidence_level: float = 0.7
 
 
@@ -2484,7 +2483,7 @@ class AdvancedMemorySystem:
         date_to: str = None,
         context_type: ContextType = None,
         limit: int = 50,
-    ) -> List[TimelineEntry]:
+    ) -> list[TimelineEntry]:
         """Pobiera wpisy z timeline z filtrami"""
         with _DB_LOCK:
             conn = _connect()
@@ -2520,7 +2519,7 @@ class AdvancedMemorySystem:
             finally:
                 conn.close()
 
-    def search_timeline(self, query: str, limit: int = 10) -> List[TimelineEntry]:
+    def search_timeline(self, query: str, limit: int = 10) -> list[TimelineEntry]:
         """Wyszukuje w timeline po słowach kluczowych"""
         all_entries = self.get_timeline_entries(limit=1000)
 
@@ -2605,7 +2604,7 @@ class AdvancedMemorySystem:
 
         return entry
 
-    def _extract_projects(self, text: str) -> List[str]:
+    def _extract_projects(self, text: str) -> list[str]:
         """Wyodrębnia nazwy projektów z tekstu"""
         # Proste heurystyki dla typowych nazw projektów
         patterns = [
@@ -2631,13 +2630,13 @@ class AdvancedMemorySystem:
 
         return list(projects)[:10]
 
-    def _extract_files(self, text: str) -> List[str]:
+    def _extract_files(self, text: str) -> list[str]:
         """Wyodrębnia nazwy plików z tekstu"""
         pattern = r"\b([a-zA-Z0-9_-]+\.[a-z]{2,4})\b"
         files = set(re.findall(pattern, text))
         return list(files)[:20]
 
-    def _extract_achievements(self, text: str) -> List[str]:
+    def _extract_achievements(self, text: str) -> list[str]:
         """Wyodrębnia osiągnięcia z tekstu"""
         achievement_keywords = [
             "naprawione",
@@ -2662,7 +2661,7 @@ class AdvancedMemorySystem:
 
         return achievements[:10]
 
-    def _extract_problems(self, text: str) -> List[str]:
+    def _extract_problems(self, text: str) -> list[str]:
         """Wyodrębnia problemy z tekstu"""
         problem_keywords = [
             "błąd",
@@ -2784,7 +2783,7 @@ class AdvancedMemorySystem:
             finally:
                 conn.close()
 
-    def switch_context(self, new_context: ContextType) -> Dict[str, Any]:
+    def switch_context(self, new_context: ContextType) -> dict[str, Any]:
         """Przełącza kontekst i przygotowuje odpowiednie fakty"""
         context_memory = self.get_context_memory(new_context)
 
@@ -2836,7 +2835,7 @@ class AdvancedMemorySystem:
             finally:
                 conn.close()
 
-    def get_recent_reflections(self, limit: int = 10) -> List[SelfReflectionNote]:
+    def get_recent_reflections(self, limit: int = 10) -> list[SelfReflectionNote]:
         """Pobiera ostatnie refleksje"""
         with _DB_LOCK:
             conn = _connect()
@@ -2917,7 +2916,7 @@ class AdvancedMemorySystem:
         description: str = "",
         metadata: dict = None,
         file_path: str = "",
-        tags: List[str] = None,
+        tags: list[str] = None,
     ) -> str:
         """Zapisuje pamięć o pliku"""
         file_id = _id_for(f"{filename}_{time.time()}")
@@ -2955,7 +2954,7 @@ class AdvancedMemorySystem:
             finally:
                 conn.close()
 
-    def search_file_memory(self, query: str, file_type: str = None) -> List[dict]:
+    def search_file_memory(self, query: str, file_type: str = None) -> list[dict]:
         """Wyszukuje w pamięci plików"""
         with _DB_LOCK:
             conn = _connect()
@@ -3025,7 +3024,7 @@ class AdvancedMemorySystem:
             finally:
                 conn.close()
 
-    def predict_next_action(self, current_input: str) -> List[dict]:
+    def predict_next_action(self, current_input: str) -> list[dict]:
         """Przewiduje następną akcję na podstawie wzorców"""
         with _DB_LOCK:
             conn = _connect()
@@ -3137,7 +3136,7 @@ class AdvancedMemorySystem:
             finally:
                 conn.close()
 
-    def list_memory_versions(self, limit: int = 20) -> List[dict]:
+    def list_memory_versions(self, limit: int = 20) -> list[dict]:
         """Lista wersji pamięci"""
         with _DB_LOCK:
             conn = _connect()
@@ -3400,7 +3399,7 @@ class AdvancedMemorySystem:
 
 # ====== SINGLETON FACTORY ======
 
-_ADVANCED_MEM_SINGLETON: Optional[AdvancedMemorySystem] = None
+_ADVANCED_MEM_SINGLETON: AdvancedMemorySystem | None = None
 
 
 def get_advanced_memory(namespace: str = None) -> AdvancedMemorySystem:

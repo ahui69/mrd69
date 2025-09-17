@@ -25,20 +25,16 @@ import json
 import time
 import uuid
 from collections import defaultdict
-from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta
+from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fastapi import WebSocket
 
 # Import wszystkich modułów
 import crypto_advisor_full
-from memory import Memory, get_advanced_memory, AdvancedMemorySystem, ContextType, MoodType
-import travelguide
-import autonauka
-import programista
-import writing_all_pro
+from memory import ContextType, Memory, MoodType, get_advanced_memory
 
 # === PSYCHIKA & ADVANCED AI MODULES ===
 try:
@@ -77,8 +73,8 @@ except ImportError:
 
 # === SEED MEMORY & PROMPTS ===
 try:
-    import seed_memory  # Memory seeding system
     import prompt  # Advanced prompt management
+    import seed_memory  # Memory seeding system
 
     SEED_MEMORY_AVAILABLE = True
     PROMPT_AVAILABLE = True
@@ -136,8 +132,8 @@ class ChatMessage:
     message_type: str = "text"  # text, voice, image, file, system
     timestamp: float = None
     status: str = "sent"  # sending, sent, delivered, error
-    metadata: Dict[str, Any] = None
-    attachments: List[Dict[str, Any]] = None
+    metadata: dict[str, Any] = None
+    attachments: list[dict[str, Any]] = None
 
     def __post_init__(self):
         if self.timestamp is None:
@@ -199,7 +195,7 @@ class MordzixPersonality:
 
         self.enthusiasm_boosters = [" 🚀", " 💪", " 🔥", " ⚡", " 🎯", " 💯", " 🚀💪"]
 
-    def enhance_response(self, response: str, context: Dict[str, Any] = None) -> str:
+    def enhance_response(self, response: str, context: dict[str, Any] = None) -> str:
         """Dodaje personality do odpowiedzi - casual tone bez filtrów."""
         if not response:
             return response
@@ -270,9 +266,9 @@ class MordzixChatEngine:
         self.memory_system = Memory()
         self.advanced_memory = get_advanced_memory()
         self.personality = MordzixPersonality()
-        self.active_threads: Dict[str, ChatThread] = {}
-        self.message_history: Dict[str, List[ChatMessage]] = {}
-        self.websocket_connections: Dict[str, WebSocket] = {}
+        self.active_threads: dict[str, ChatThread] = {}
+        self.message_history: dict[str, list[ChatMessage]] = {}
+        self.websocket_connections: dict[str, WebSocket] = {}
 
         # Kontekst rozmowy dla zaawansowanej pamięci
         self.current_context = ContextType.CHATTING
@@ -298,7 +294,7 @@ class MordzixChatEngine:
         user_id: str,
         content: str,
         message_type: str = "text",
-        attachments: List = None,
+        attachments: list = None,
     ) -> ChatMessage:
         """Dodaje wiadomość do wątku."""
         message_id = str(uuid.uuid4())
@@ -433,7 +429,7 @@ class MordzixChatEngine:
 
         return ai_msg
 
-    def _analyze_intent(self, content: str) -> Dict[str, Any]:
+    def _analyze_intent(self, content: str) -> dict[str, Any]:
         """Analizuje intencję użytkownika."""
         content_lower = content.lower()
 
@@ -472,7 +468,7 @@ class MordzixChatEngine:
         # General chat
         return {"type": "general", "save_to_ltm": False, "module": None}
 
-    async def _generate_response(self, content: str, context: str, intent: Dict[str, Any]) -> str:
+    async def _generate_response(self, content: str, context: str, intent: dict[str, Any]) -> str:
         """Generuje odpowiedź używając wszystkich dostępnych modułów."""
 
         # Emit event do IO Pipeline
@@ -557,7 +553,7 @@ class MordzixChatEngine:
 
         return clean_content
 
-    async def _emit_pipeline_event(self, event_type: str, data: Dict[str, Any]):
+    async def _emit_pipeline_event(self, event_type: str, data: dict[str, Any]):
         """Emituje event do IO Pipeline."""
         if not IO_PIPELINE_AVAILABLE:
             return
@@ -768,7 +764,7 @@ class MordzixChatEngine:
         )
 
     def _save_to_ltm(
-        self, thread_id: str, user_msg: ChatMessage, ai_msg: ChatMessage, intent: Dict[str, Any]
+        self, thread_id: str, user_msg: ChatMessage, ai_msg: ChatMessage, intent: dict[str, Any]
     ):
         """Zapisuje ważne rzeczy do pamięci długoterminowej."""
         try:
@@ -784,7 +780,7 @@ class MordzixChatEngine:
         except Exception as e:
             print(f"Error saving to LTM: {e}")
 
-    async def send_to_websocket(self, user_id: str, message_data: Dict[str, Any]):
+    async def send_to_websocket(self, user_id: str, message_data: dict[str, Any]):
         """Wysyła wiadomość przez WebSocket jeśli user jest połączony."""
         if user_id in self.websocket_connections:
             try:
@@ -805,7 +801,7 @@ class MordzixCryptoIntegration:
 
     def __init__(self, chat_engine: MordzixChatEngine):
         self.chat_engine = chat_engine
-        self.monitored_portfolios: Dict[str, str] = {}  # user_id -> portfolio_id
+        self.monitored_portfolios: dict[str, str] = {}  # user_id -> portfolio_id
 
     async def start_portfolio_monitoring(self, user_id: str, portfolio_id: str):
         """Rozpoczyna monitoring portfolio dla usera."""
@@ -820,7 +816,7 @@ class MordzixCryptoIntegration:
             },
         )
 
-    async def portfolio_alert(self, portfolio_id: str, alert_data: Dict[str, Any]):
+    async def portfolio_alert(self, portfolio_id: str, alert_data: dict[str, Any]):
         """Wysyła alert portfolio do odpowiedniego usera."""
         for user_id, monitored_portfolio in self.monitored_portfolios.items():
             if monitored_portfolio == portfolio_id:
@@ -912,7 +908,7 @@ class MordzixReliabilitySystem:
 
         return False
 
-    def get_health_stats(self) -> Dict[str, Any]:
+    def get_health_stats(self) -> dict[str, Any]:
         """Zwraca statystyki zdrowia systemu."""
         return {
             "success_counts": dict(self.success_counts),
@@ -943,17 +939,17 @@ class MordzixDataManager:
         for dir_name in dirs:
             (self.base_path / dir_name).mkdir(parents=True, exist_ok=True)
 
-    def save_conversation(self, thread_id: str, conversation_data: Dict[str, Any]):
+    def save_conversation(self, thread_id: str, conversation_data: dict[str, Any]):
         """Zapisuje konwersację do pliku."""
         file_path = self.base_path / "conversations" / f"{thread_id}.json"
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(conversation_data, f, ensure_ascii=False, indent=2)
 
-    def load_conversation(self, thread_id: str) -> Optional[Dict[str, Any]]:
+    def load_conversation(self, thread_id: str) -> dict[str, Any] | None:
         """Ładuje konwersację z pliku."""
         file_path = self.base_path / "conversations" / f"{thread_id}.json"
         if file_path.exists():
-            with open(file_path, "r", encoding="utf-8") as f:
+            with open(file_path, encoding="utf-8") as f:
                 return json.load(f)
         return None
 
@@ -994,7 +990,7 @@ class MordzixPluginSystem:
             print(f"❌ Failed to load plugin {plugin_name}: {e}")
         return False
 
-    def get_available_plugins(self) -> List[str]:
+    def get_available_plugins(self) -> list[str]:
         """Zwraca listę dostępnych pluginów."""
         if not self.plugin_dir.exists():
             return []
