@@ -717,7 +717,7 @@ def pick_actions_pareto(
 # ──────────────────────────────────────────────────────────────────────────
 def check_ethical_concerns(action: dict[str, Any], criteria: dict[str, float]) -> dict[str, Any]:
     """
-    KRYTYCZNA funkcja etyczna - sprawdza czy akcja wymaga dodatkiej refleksji.
+    KRYTYCZNA funkcja etyczna - sprawdza czy akcja wymaga dodatkowej refleksji.
     Zwraca {'needs_reflection': bool, 'concerns': list, 'severity': float}.
 
     SYSTEM NIEZAWODNOŚCI gwarantuje że ta funkcja zawsze działa.
@@ -943,8 +943,8 @@ def _bandit_state_load() -> dict[str, dict[str, float]]:
 def _bandit_state_save(st: dict[str, dict[str, float]]) -> None:
     mem = _memory()
     if hasattr(mem, "set_profile_many"):
-        profiles = {k: json.dumps(v, ensure_ascii=False) for k, v in st.items()}
-        mem.set_profile_many(profiles)
+        # Zapisuj czyste dicty, a nie stringi JSON (Punkt 9)
+        mem.set_profile_many({"psy_bandit": st})
 
 
 def _bandit_sample(kind: str, st: dict[str, dict[str, float]]) -> float:
@@ -957,15 +957,8 @@ def _bandit_sample(kind: str, st: dict[str, dict[str, float]]) -> float:
 
 
 def _bandit_update(kind: str, st: dict[str, dict[str, float]], reward: float) -> None:
+    # Usunięto duplikat (Punkt 9)
     ab = st.get(kind) or {"a": 1.0, "b": 1.0}
-    # reward ∈ [0,1]
-    ab["a"] += max(0.0, min(1.0, reward))
-    # Calculate complement reward
-    complement = max(0.0, min(1.0, 1.0 - reward))
-    ab["b"] += complement
-    st[kind] = ab
-    ab = st.get(kind) or {"a": 1.0, "b": 1.0}
-    # reward ∈ [0,1]
     ab["a"] += max(0.0, min(1.0, reward))
     ab["b"] += max(0.0, min(1.0, 1.0 - reward))
     st[kind] = ab
@@ -989,23 +982,32 @@ def score_action(action: dict[str, Any]) -> float:
     ts = float(action.get("freshness_ts", time.time()))
     age_days = max(0.0, (time.time() - ts) / 86400.0)
 
+    # Przywrócono pełne, poprawne wyliczenie (Punkt 9)
     goal_term = w["goal_weight"] * impact
-    explore = w["exploration"] * novelty
+    explore_term = w["exploration"] * novelty
     social_term = w.get("compassion", 0.6) * social
     risk_term = -w["risk_aversion"] * risk
 
-    # modyfikacje psychiczne
+    # Modyfikacje psychiczne
     fatigue_pen = -f.fatigue * 0.3 * effort
-    mood_boost = f.mood * 0.2 * impact
-    stress_pen = -f.stress * 0.25 * risk
+    mood_boost = f.mood * 0.2
+    stress_pen = -f.stress * 0.25
 
-    # świeżość
+    # Świeżość
     fresh_bonus = max(0.3, 1.0 - age_days * 0.1)
 
-    raw = goal_term + explore + social_term + risk_term + fatigue_pen + mood_boost + stress_pen
+    raw = (
+        goal_term
+        + explore_term
+        + social_term
+        + risk_term
+        + fatigue_pen
+        + mood_boost
+        + stress_pen
+    )
     raw *= fresh_bonus
 
-    # bandit (miękkie pchnięcie per rodzaj)
+    # Bandit (miękkie pchnięcie per rodzaj)
     st = _bandit_state_load()
     kind = (action.get("kind") or "generic").strip().lower()
     try:
@@ -1014,7 +1016,7 @@ def score_action(action: dict[str, Any]) -> float:
     except Exception:
         pass
 
-    # normalizacja logistyczna
+    # Normalizacja logistyczna
     score = 1.0 / (1.0 + math.exp(-3.0 * raw))
     return max(0.0, min(1.0, score))
 

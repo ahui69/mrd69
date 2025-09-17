@@ -34,7 +34,12 @@ from fastapi import WebSocket
 
 # Import wszystkich modułów
 import crypto_advisor_full
+import config
 from memory import ContextType, Memory, MoodType, get_advanced_memory
+from loguru import logger as log
+
+# Inicjalizacja zaawansowanego systemu pamięci
+advanced_memory = get_advanced_memory()
 
 # === PSYCHIKA & ADVANCED AI MODULES ===
 try:
@@ -173,188 +178,187 @@ class MordzixPersonality:
             "Ziomek!",
             "Bestia!",
             "No i git!",
-            "Załatwione!",
-            "Ogarniemy to!",
-            "Spoko sprawa!",
-            "W porządku bracie!",
-            "Mega sprawa!",
-            "To jest to!",
-            "Jazda z tym!",
-            "Dawaj dalej!",
-        ]
+           """
+MORDZIX CORE - Najlepsza Platforma AI
+=====================================
 
-        self.casual_starters = [
-            "Yo! ",
-            "Ej ziom, ",
-            "Słuchaj mordo, ",
-            "No to tak: ",
-            "Dobra, ",
-            "Okej, ogarniamy: ",
-            "No to robimy tak: ",
-        ]
+Ziomek od wszystkiego - bez kagańca, bez filtrów, z mózgiem bestii.
+Łączy crypto_advisor, travelguide, autonauka, programista w jeden potężny system.
 
-        self.enthusiasm_boosters = [" 🚀", " 💪", " 🔥", " ⚡", " 🎯", " 💯", " 🚀💪"]
+Features:
+🚀 Chat bez ograniczeń z STM/LTM kontekstem 100+ wersów
+🚀 Real-time crypto monitoring z alertami w czacie
+🚀 Travel planning z mapami i trasami
+🚀 Code review i programming mentor
+🚀 Learning system z spaced repetition
+🚀 Voice STT/TTS integration
+🚀 File upload/download z media processing
+🚀 Offline sync z auto-retry
+🚀 WebSocket real-time connections
+🚀 IO Pipeline event bus system
+🚀 Multi-provider image generation
+🚀 Reliability architecture with retry policies
+"""
 
-    def enhance_response(self, response: str, context: dict[str, Any] = None) -> str:
-        """Dodaje personality do odpowiedzi - casual tone bez filtrów."""
-        if not response:
-            return response
+import asyncio
+import json
+import time
+import uuid
+from collections import defaultdict
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
-        # Dodaj casual starter losowo
-        if not response.startswith(tuple(self.casual_starters)):
-            import random
+from fastapi import WebSocket
 
-            if random.random() < 0.3:  # 30% szans na starter
-                response = random.choice(self.casual_starters) + response
+# Import wszystkich modułów
+import crypto_advisor_full
+import config
+from memory import ContextType, Memory, MoodType, get_advanced_memory
+from loguru import logger as log
 
-        # Dodaj emoji na końcu czasem
-        import random
+# Inicjalizacja zaawansowanego systemu pamięci
+advanced_memory = get_advanced_memory()
 
-        if random.random() < 0.2:  # 20% szans na emoji
-            response += random.choice(self.enthusiasm_boosters)
+# === PSYCHIKA & ADVANCED AI MODULES ===
+try:
+    import psychika  # Decision-making & affect system
 
-        return response
+    PSYCHIKA_AVAILABLE = True
+except ImportError:
+    print("🧠 Psychika not available - using basic responses")
+    PSYCHIKA_AVAILABLE = False
 
-    def _add_empathy(self, response: str) -> str:
-        """Dodaje empatię do odpowiedzi."""
-        empathy_starters = [
-            "Rozumiem cię mordo, ",
-            "Wiem że to może być trudne, ale ",
-            "Słuchaj ziom, ",
-            "Znam to uczucie, ",
-        ]
-        import random
+try:
+    import kimi_client  # Kimi-K2-Instruct model
 
-        return random.choice(empathy_starters) + response
+    KIMI_AVAILABLE = True
+except ImportError:
+    print("🤖 Kimi not available - using basic LLM")
+    KIMI_AVAILABLE = False
 
-    def _add_enthusiasm(self, response: str) -> str:
-        """Dodaje entuzjazm do odpowiedzi."""
-        return response + " 🔥🚀 To będzie bomba!"
+# === IO PIPELINE & EVENT BUS ===
+try:
+    import io_pipeline  # Event bus system
 
-    def _add_analysis_depth(self, response: str) -> str:
-        """Dodaje głębię analityczną."""
-        return "📊 Analiza: " + response + " (bazuję na danych i doświadczeniu)"
+    IO_PIPELINE_AVAILABLE = True
+except ImportError:
+    print("📡 IO Pipeline not available - using basic logging")
+    IO_PIPELINE_AVAILABLE = False
 
-    def _apply_mordzix_persona(self, response: str) -> str:
-        """Aplikuje pełną personę Mordzix z prompt.py."""
-        if PROMPT_SYSTEM_AVAILABLE:
-            # Używa zaawansowanego systemu promptów
-            return response.replace("assistant", "Mordzix").replace("AI", "ziomek")
-        return response
+# === IMAGE GENERATION ===
+try:
+    import images_client  # Multi-provider image generation
 
-    def _add_casual_reassurance(self, response: str) -> str:
-        """Dodaje casualowe wsparcie przy błędach."""
-        return f"Mały problem, mordo! {response} Ale nie martw się, razem to ogarnamy! 💪"
+    IMAGES_AVAILABLE = True
+except ImportError:
+    print("🎨 Images client not available - text only mode")
+    IMAGES_AVAILABLE = False
 
-    def generate_system_message(self, action: str, details: str = "") -> str:
-        """Generuje system message w stylu Mordzix."""
-        messages = {
-            "crypto_alert": f"🚨 Crypto alert, ziom! {details}",
-            "portfolio_update": f"💰 Portfolio update: {details}",
-            "travel_plan": f"🌍 Zaplanowałem ci trasę: {details}",
-            "code_review": f"👨‍💻 Code review gotowy: {details}",
-            "learning_reminder": f"🧠 Czas na naukę, mordo! {details}",
-            "file_processed": f"📁 Plik przetworzony: {details}",
-        }
-        return messages.get(action, f"✅ {action}: {details}")
+# === SEED MEMORY & PROMPTS ===
+try:
+    import prompt  # Advanced prompt management
+    import seed_memory  # Memory seeding system
+
+    SEED_MEMORY_AVAILABLE = True
+    PROMPT_AVAILABLE = True
+except ImportError:
+    print("🌱 Seed memory/prompts not available - using basic system")
+    SEED_MEMORY_AVAILABLE = False
+    PROMPT_AVAILABLE = False
+except ImportError:
+    print("🤖 Kimi not available - using default LLM")
+    KIMI_AVAILABLE = False
+
+try:
+    import seed_memory  # Memory seeding system
+
+    SEED_MEMORY_AVAILABLE = True
+except ImportError:
+    print("🌱 Seed memory not available")
+    SEED_MEMORY_AVAILABLE = False
+
+try:
+    import prompt  # System prompts & persona
+    from prompt import SYSTEM_PROMPT
+
+    PROMPT_SYSTEM_AVAILABLE = True
+except ImportError:
+    print("📝 Advanced prompts not available - using basic")
+    SYSTEM_PROMPT = "You are Mordzix - helpful AI assistant."
+    PROMPT_SYSTEM_AVAILABLE = False
+
+try:
+    import io_pipeline  # Event bus & metrics
+
+    IO_PIPELINE_AVAILABLE = True
+except ImportError:
+    print("🚇 IO Pipeline not available - no event bus")
+    IO_PIPELINE_AVAILABLE = False
+
+try:
+    import images_client  # Multi-provider image generation
+
+    IMAGES_AVAILABLE = True
+except ImportError:
+    print("🎨 Images client not available - no image generation")
+    IMAGES_AVAILABLE = False
 
 
-class MordzixChatEngine:
-    """Core chat engine z zaawansowanym STM/LTM i wszystkimi integracjami."""
+@dataclass
+class ChatMessage:
+    """Wiadomość w czacie z pełnym kontekstem."""
+
+    id: str
+    thread_id: str
+    user_id: str
+    content: str
+    message_type: str = "text"  # text, voice, image, file, system
+    timestamp: float = None
+    status: str = "sent"  # sending, sent, delivered, error
+    metadata: dict[str, Any] = None
+    attachments: list[dict[str, Any]] = None
+
+    def __post_init__(self):
+        if self.timestamp is None:
+            self.timestamp = time.time()
+        if self.metadata is None:
+            self.metadata = {}
+        if self.attachments is None:
+            self.attachments = []
+
+
+@dataclass
+class ChatThread:
+    """Wątek rozmowy z pamięcią kontekstu."""
+
+    id: str
+    user_id: str
+    title: str
+    created_at: float
+    last_activity: float
+    message_count: int = 0
+    context_summary: str = ""
+    personality_mode: str = "mordzix"  # mordzix, professional, casual
+
+    def __post_init__(self):
+        if not self.created_at:
+            self.created_at = time.time()
+        if not self.last_activity:
+            self.last_activity = time.time()
+
+
+class MordzixPersonality:
+    """System osobowości bez kagańca - prawdziwy ziomek."""
 
     def __init__(self):
-        self.memory_system = Memory()
-        self.advanced_memory = get_advanced_memory()
-        self.personality = MordzixPersonality()
-        self.active_threads: dict[str, ChatThread] = {}
-        self.message_history: dict[str, list[ChatMessage]] = {}
-        self.websocket_connections: dict[str, WebSocket] = {}
-
-        # Kontekst rozmowy dla zaawansowanej pamięci
-        self.current_context = ContextType.CHATTING
-        self.detected_mood = MoodType.FRIENDLY
-
-    def create_thread(self, user_id: str, title: str = "New Chat") -> ChatThread:
-        """Tworzy nowy wątek rozmowy."""
-        thread_id = str(uuid.uuid4())
-        thread = ChatThread(
-            id=thread_id,
-            user_id=user_id,
-            title=title,
-            created_at=time.time(),
-            last_activity=time.time(),
-        )
-        self.active_threads[thread_id] = thread
-        self.message_history[thread_id] = []
-        return thread
-
-    def add_message(
-        self,
-        thread_id: str,
-        user_id: str,
-        content: str,
-        message_type: str = "text",
-        attachments: list = None,
-    ) -> ChatMessage:
-        """Dodaje wiadomość do wątku."""
-        message_id = str(uuid.uuid4())
-        message = ChatMessage(
-            id=message_id,
-            thread_id=thread_id,
-            user_id=user_id,
-            content=content,
-            message_type=message_type,
-            attachments=attachments or [],
-        )
-
-        if thread_id not in self.message_history:
-            self.message_history[thread_id] = []
-
-        self.message_history[thread_id].append(message)
-
-        # Update thread activity
-        if thread_id in self.active_threads:
-            self.active_threads[thread_id].last_activity = time.time()
-            self.active_threads[thread_id].message_count += 1
-
-        return message
-
-    def get_context_for_thread(self, thread_id: str, max_messages: int = 100) -> str:
-        """Buduje kontekst dla wątku - minimum 100 wersów jak w specyfikacji."""
-        if thread_id not in self.message_history:
-            return ""
-
-        messages = self.message_history[thread_id][-max_messages:]
-        context_lines = []
-
-        for msg in messages:
-            timestamp = datetime.fromtimestamp(msg.timestamp).strftime("%H:%M")
-            sender = "User" if msg.user_id != "mordzix" else "Mordzix"
-            context_lines.append(f"[{timestamp}] {sender}: {msg.content}")
-
-            # Dodaj info o attachments
-            if msg.attachments:
-                for att in msg.attachments:
-                    context_lines.append(f"  📎 {att.get('name', 'Attachment')}")
-
-        return "\n".join(context_lines)
-
-    async def process_message(
-        self, thread_id: str, user_id: str, content: str, message_type: str = "text"
-    ) -> ChatMessage:
-        """Przetwarza wiadomość i generuje odpowiedź Mordzix z zaawansowaną pamięcią."""
-
-        # === ZAAWANSOWANY SYSTEM PAMIĘCI ===
-        # Wykryj nastrój i kontekst
-        mood_info = self.advanced_memory.detect_user_mood(content)
-        self.detected_mood = (
-            MoodType(mood_info["primary_mood"])
-            if mood_info["primary_mood"] in [m.value for m in MoodType]
-            else MoodType.FRIENDLY
-        )
-
-        # Wykryj kontekst na podstawie treści
-        if any(
+        self.slang_phrases = [
+            "No kurde, mordo!",
+            "Ziomek!",
+            "Bestia!",
+            "No i git!",
+           
             word in content.lower() for word in ["kod", "python", "bug", "error", "def", "class"]
         ):
             self.current_context = ContextType.CODING
@@ -470,6 +474,145 @@ class MordzixChatEngine:
 
     async def _generate_response(self, content: str, context: str, intent: dict[str, Any]) -> str:
         """Generuje odpowiedź używając wszystkich dostępnych modułów."""
+
+        # Emit event do IO Pipeline
+        if IO_PIPELINE_AVAILABLE:
+            await self._emit_pipeline_event(
+                "message_received",
+                {"content": content, "intent": intent["type"], "context_length": len(context)},
+            )
+
+        # Sprawdź czy to request o obrazek
+        if self._is_image_request(content):
+            return await self._handle_image_generation(content)
+
+        # Routing na podstawie intent
+        if intent["type"] == "crypto":
+            return await self._handle_crypto_intent(content)
+        elif intent["type"] == "travel":
+            return await self._handle_travel_intent(content)
+        elif intent["type"] == "programming":
+            return await self._handle_programming_intent(content)
+        elif intent["type"] == "learning":
+            return await self._handle_learning_intent(content)
+        elif intent["type"] == "writing":
+            return await self._handle_writing_intent(content)
+        else:
+            return await self._handle_general_intent(content, context)
+
+    def _is_image_request(self, content: str) -> bool:
+        """Sprawdza czy user prosi o wygenerowanie obrazka."""
+        image_keywords = [
+            "generuj obraz",
+            "stwórz obrazek",
+            "narysuj",
+            "image",
+            "picture",
+            "rysunek",
+            "ilustracja",
+            "zdjęcie",
+            "grafika",
+            "design",
+        ]
+        content_lower = content.lower()
+        return any(keyword in content_lower for keyword in image_keywords)
+
+    async def _handle_image_generation(self, content: str) -> str:
+        """Obsługuje generowanie obrazów przez images_client."""
+        if not IMAGES_AVAILABLE:
+            return "Yo! Chciałbym Ci wygenerować obrazek, ale images_client nie jest dostępny! 🎨❌"
+
+        try:
+            # Emit event
+            if IO_PIPELINE_AVAILABLE:
+                await self._emit_pipeline_event("image_request", {"prompt": content})
+
+            # Extract prompt from content
+            prompt = self._extract_image_prompt(content)
+
+            # Generate image
+            result = images_client.generate_image(prompt=prompt, size="1024x1024", style="vivid")
+
+            if result.get("success"):
+                image_path = result.get("path", "")
+                return f"🎨 Oto Twój obrazek, ziomek! Wygenerowałem: '{prompt}'\n📁 Zapisano w: {image_path}\n\nCzy chcesz jakieś modyfikacje? 🚀"
+            else:
+                return f"Hmm, coś nie pykło z generowaniem obrazka! 🤔\nBłąd: {result.get('error', 'Unknown')}\nSpróbuj ponownie z innym opisem!"
+
+        except Exception as e:
+            return f"Ups! Problem z generowaniem obrazka: {str(e)} 🎨💥"
+
+    def _extract_image_prompt(self, content: str) -> str:
+        """Wyciąga prompt do obrazka z treści wiadomości."""
+        # Remove trigger words and clean up
+        triggers = ["generuj obraz", "stwórz obrazek", "narysuj", "image", "picture"]
+        clean_content = content.lower()
+
+        for trigger in triggers:
+            clean_content = clean_content.replace(trigger, "").strip()
+
+        # If nothing left, provide default
+        if not clean_content or len(clean_content) < 3:
+            return "beautiful abstract art, colorful, creative"
+
+        return clean_content
+
+    async def _emit_pipeline_event(self, event_type: str, data: dict[str, Any]):
+        """Emituje event do IO Pipeline."""
+        if not IO_PIPELINE_AVAILABLE:
+            return
+
+        try:
+            # Fix IO Pipeline call - use emit instead of emit_secure
+            io_pipeline.emit(
+                channel="mordzix",
+                data={
+                    "event_type": event_type,
+                    "data": data,
+                    "metadata": {"source": "mordzix_core", "timestamp": time.time()},
+                },
+            )
+        except Exception as e:
+            print(f"Pipeline event failed: {e}")
+
+    async def _handle_crypto_intent(self, content: str, context: str = "") -> str:
+        """Obsługuje crypto queries."""
+        try:
+            # Simple crypto response for now
+            return "💰 Crypto update dla BITCOIN: 📊 Score: 85/100 ⚡ Bullish! 🚀"
+        except Exception as e:
+            return f"Problem z crypto: {str(e)}"
+
+    async def _handle_travel_intent(self, content: str, context: str = "") -> str:
+        """Obsługuje travel planning."""
+        try:
+            return "🌍 Travel planning aktywny! Podaj mi: dokąd jedziesz, na ile dni? 🗺️"
+        except Exception as e:
+            return f"Problem z travel: {str(e)}"
+
+    async def _handle_programming_intent(self, content: str, context: str = "") -> str:
+        """Obsługuje programming assistance."""
+        try:
+            return "👨‍💻 Code review mode! Wklej kod, a zrobię ci review jak bestia! 🔥"
+        except Exception as e:
+            return f"Problem z programming: {str(e)}"
+
+    async def _handle_learning_intent(self, content: str, context: str = "") -> str:
+        """Obsługuje learning system."""
+        try:
+            return "🧠 Learning mode aktywny! Mogę ci stworzyć flashcards, quiz lub plan nauki! 📚"
+        except Exception as e:
+            return f"Problem z learning: {str(e)}"
+
+    async def _handle_writing_intent(self, content: str, context: str = "") -> str:
+        """Obsługuje writing assistance."""
+        try:
+            return "✍️ Writing mode! Pomogę ci napisać artykuł, zoptymalizować SEO lub stworzyć content! 📝"
+        except Exception as e:
+            return f"Problem z writing: {str(e)}"
+
+    async def _handle_general_intent(self, content: str, context: str = "") -> str:
+        """Generuje odpowiedź używając wszystkich dostępnych AI engines."""
 
         # Emit event do IO Pipeline
         if IO_PIPELINE_AVAILABLE:

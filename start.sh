@@ -43,4 +43,4 @@ sleep 2
 
 echo "--- ▶️ Uruchamianie serwera Mordzix ---"
 echo "Serwer będzie dostępny pod adresem http://<TWÓJ_IP_RUNPOD>:5959"
-python -m uvicorn main:app --host 0.0.0.0 --port 5959
+python3 -m uvicorn main:app --host 0.0.0.0 --port 5959

@@ -1,8 +1,12 @@
-# Python
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# C extensions
 *.so
+
+# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -16,6 +20,7 @@ parts/
 sdist/
 var/
 wheels/
+pip-wheel-metadata/
 share/python-wheels/
 *.egg-info/
 .installed.cfg
@@ -43,66 +48,74 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
-cover/
 
-# Virtual environments
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# PEP 582; __pypackages__
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
 .env
+.env.local
 .venv
 env/
 venv/
 ENV/
-env.bak/
-venv.bak/
+env.bak
+venv.bak
 
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+# Spyder project settings
+.spyderproject
+.spyproject
 
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# Rope project settings
+.ropeproject
 
-# Project specific
-*.log
-*.db
-*.sqlite
-*.sqlite3
-data/
-logs/
-temp/
-tmp/
-.env.local
-.env.production
+# mkdocs documentation
+/site
 
-# AI/ML models (jeśli są duże)
-*.bin
-*.pkl
-*.model
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
 
-# Backup files
-*_backup_*
-backup/
+# Pyre type checker
+.pyre/
 
-# SQLite browser files
-sqlitebrowser/
-
-# Specific files
-backend.log
-psychika_debug.log
-server.log
-log.txt
-dupes.txt
-
-# Sensitive data
-config_local.py
-secrets.json
-.secrets
-api_keys.txt
+# pytype
+.pytype/

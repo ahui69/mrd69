@@ -1,172 +1,57 @@
-# 🧠 MORDZIX - ZAAWANSOWANY SYSTEM AI Z PAMIĘCIĄ EPISODYCZNĄ
+# MORDZIX CORE v3.0 - Zaawansowany System Pamięci
 
-## 📖 OPIS
-
-Mordzix to zaawansowany system AI z pełną pamięcią episodyczną, kontekstową i emocjonalną. System posiada hybrydowy RAG z zaawansowanymi funkcjami pamięci i integracją z RunPod.
-
-### 🎯 KLUCZOWE FUNKCJE:
-
-- **📅 Pamięć episodyczna** - Timeline z automatycznymi podsumowaniami dnia
-- **🧠 Pamięć kontekstowa** - 7 różnych "mózgów" (coding, creative, business, etc.)
-- **🤔 Samorefleksja AI** - Automatyczne notatki coacha i reguły
-- **📁 Pamięć sensoryczna** - Storage plików z metadanymi
-- **😊 Pamięć emocjonalna** - Wykrywanie nastroju i adaptacja odpowiedzi
-- **🔮 Pamięć predykcyjna** - Przewidywanie następnych akcji
-- **💾 System wersjonowania** - Git-like backupy pamięci
-- **👥 Mapping relacji** - Graf osób i ich relacji
-- **⚡ Hybrydowy RAG** - Embeddings + TF-IDF + BM25/FTS5 + świeżość
-- **🔒 RunPod Integration** - Persystencja danych w chmurze
-
-## 🚀 QUICK START
-
-### Lokalne uruchomienie:
-```bash
-git clone https://github.com/YOUR_USERNAME/mordzix-advanced.git
-cd mordzix-advanced
-python -m venv .venv
-source .venv/bin/activate  # Linux/Mac
-# .venv\Scripts\activate    # Windows
-pip install -r requirements.txt
-python main.py
-```
-
-### RunPod deployment:
-Sprawdź [RUNPOD_DEPLOYMENT_GUIDE.md](RUNPOD_DEPLOYMENT_GUIDE.md) dla pełnych instrukcji.
-
-## 🏗️ ARCHITEKTURA
-
-- **main.py** - FastAPI server z endpointami dla advanced memory
-- **memory.py** - Zaawansowany system pamięci (3000+ linii)
-- **mordzix_core.py** - Główny silnik AI z integracją pamięci
-- **config.py** - Konfiguracja systemu
-
-## 📊 API ENDPOINTS
-
-### Chat & WebSocket:
-- `/ws` - główny endpoint do komunikacji czatowej
-- `/chat` - REST endpoint dla czatu
-
-### Memory Timeline:
-- `GET /memory/timeline` - Pobierz timeline interakcji
-- `GET /memory/timeline/search` - Wyszukaj w timeline
-- `POST /memory/timeline/daily-summary` - Stwórz podsumowanie dnia
-
-### Context Management:
-- `GET /memory/context/{type}` - Pobierz pamięć kontekstową
-- `POST /memory/context/switch` - Przełącz kontekst
-
-### Mood & Predictions:
-- `GET /memory/mood` - Wykryj nastrój z tekstu
-- `GET /memory/predictions` - Przewiduj następne akcje
-
-### Memory Versioning:
-- `GET /memory/versions` - Lista wersji pamięci
-- `POST /memory/backup` - Stwórz backup
-- `POST /memory/restore/{id}` - Przywróć wersję
-
-### Relationships:
-- `GET /memory/relationships` - Graf relacji
-- `GET /memory/person/{name}` - Profil osoby
-
-### Legacy API:
-- `/health` - sprawdzenie stanu serwera
-- `/episodes` - pobiera historię rozmów
-- `/reset` - czyści pamięć krótkotrwałą
-- `/search` - wyszukiwanie wiedzy
-- `/runpod/status` - status integracji RunPod
-
-## 🔧 KONFIGURACJA
-
-### Environment Variables:
-```bash
-export OPENAI_API_KEY="your-api-key"
-export APP_TITLE="Mordzix Advanced"
-
-# RunPod Integration
-export USE_RUNPOD=true
-export RUNPOD_PERSIST_DIR="/workspace/data"
-export RUNPOD_API_KEY="your-runpod-key"
-export RUNPOD_ENDPOINT_ID="your-endpoint-id"
-
-# Memory Settings
-export MEM_NS="default"
-export PSY_ENCRYPT_KEY="your-encryption-key"
-export LTM_MIN_CONF=0.25
-export MAX_LTM_FACTS=2000000
-```
-
-### Database:
-System używa SQLite z zaawansowaną pamięcią:
-- **Główna baza**: `data/memory.db` - RAG i podstawowa pamięć
-- **Advanced Memory**: 7 nowych tabel dla episodycznej pamięci
-- **RunPod Sync**: Automatyczna synchronizacja co 15 minut
-
-## 🧪 TESTOWANIE
-
-```bash
-# Uruchom testy
-python -m pytest tests/
-
-# Test systemu pamięci
-curl "http://localhost:5959/memory/timeline"
-curl "http://localhost:5959/memory/mood?text=test"
-curl "http://localhost:5959/health"
-
-# Test chat integration
-curl -X POST "http://localhost:5959/chat" \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Cześć!", "mode": "mordzix"}'
-```
-
-## 📈 MONITORING
-
-System loguje do:
-- `backend.log` - Główne logi systemu
-- `data/advanced_memory.log` - Logi pamięci
-- `server.log` - Logi serwera
-
-### RunPod Management:
-```bash
-# Ręczna synchronizacja
-python runpod_sync.py force
-
-# Status RunPod
-python runpod_sync.py status
-
-# Restore z RunPod
-python runpod_sync.py restore
-```
-
-## 🚀 DEPLOYMENT
-
-### Lokalne:
-```bash
-uvicorn main:app --host 0.0.0.0 --port 5959 --reload
-```
-
-### Production (RunPod):
-```bash
-# Patrz RUNPOD_DEPLOYMENT_GUIDE.md
-uvicorn main:app --host 0.0.0.0 --port 5959
-```
-
-### Docker:
-```bash
-docker build -t mordzix-advanced .
-docker run -d --gpus all -p 5959:5959 mordzix-advanced
-```
-
-## 📄 LICENCJA
-
-MIT License - sprawdź plik LICENSE
-
-## 🆘 WSPARCIE
-
-W przypadku problemów:
-1. Sprawdź [RUNPOD_DEPLOYMENT_GUIDE.md](RUNPOD_DEPLOYMENT_GUIDE.md)
-2. Zgłoś issue na GitHub
-3. Sprawdź logi w folderze `data/`
+**MORDZIX CORE** to platforma AI nowej generacji, wyposażona w rewolucyjny, 8-modułowy system pamięci, który naśladuje ludzkie procesy poznawcze. Koniec z amnezją. Czas na AI, która rozumie, kojarzy i uczy się jak człowiek.
 
 ---
 
-**🧠 Mordzix - AI z prawdziwą pamięcią episodyczną!**
+## 🧠 Kluczowe Funkcje Zaawansowanej Pamięci
+
+1.  **Pamięć Epizodyczna (Timeline):** Każda interakcja jest zapisywana jako wpis w dzienniku, tworząc bogatą historię Waszej współpracy.
+2.  **Pamięć Kontekstowa:** Różne "mózgi" dla różnych zadań (kodowanie, pisanie, biznes), każdy z własnymi priorytetami i wiedzą.
+3.  **Samorefleksja:** AI analizuje swoje działania, uczy się z błędów i tworzy notatki "co robić lepiej", aby unikać powtarzania tych samych pomyłek.
+4.  **Pamięć Emocjonalna:** Wykrywa nastrój użytkownika i dostosowuje styl komunikacji – od ultra-konkretnych komend po luźną rozmowę.
+5.  **Pamięć Plikowa:** Zapamiętuje pliki, grafiki i diagramy, które razem przerabialiście, i potrafi do nich wracać.
+6.  **Pamięć Predykcyjna:** Uczy się Twoich wzorców zachowań, aby przewidywać, czego zaraz będziesz potrzebować.
+7.  **Wersjonowanie Pamięci:** "Git dla pamięci" – twórz snapshoty i przywracaj stan pamięci do dowolnego momentu w czasie.
+8.  **Mapowanie Relacji:** Tworzy graf powiązań między osobami i projektami, rozumiejąc, kto jest kim w Twoim świecie.
+
+## 🚀 Uruchomienie
+
+Projekt wykorzystuje `Makefile` do zarządzania.
+
+1.  **Instalacja:**
+    ```bash
+    make setup
+    ```
+    *Ta komenda stworzy środowisko wirtualne, zainstaluje wszystkie zależności z `pyproject.toml` i skonfiguruje pre-commit hooks.*
+
+2.  **Uruchomienie serwera deweloperskiego:**
+    ```bash
+    make dev
+    ```
+    *Serwer FastAPI uruchomi się z auto-reload na porcie 8080.*
+
+## 🛠️ Dostępne Komendy
+
+-   `make dev`: Uruchom serwer deweloperski.
+-   `make lint`: Sprawdź jakość kodu (ruff, mypy).
+-   `make test`: Uruchom testy (pytest).
+-   `make seed`: Załaduj dane początkowe do pamięci.
+-   `make setup`: Zainstaluj projekt.
+
+##  API Endpoints
+
+Aplikacja udostępnia bogate API do zarządzania zaawansowaną pamięcią. Pełna dokumentacja jest dostępna pod `/docs` po uruchomieniu serwera.
+
+### Przykładowe Endpoints:
+
+-   `GET /memory/timeline`: Pobierz ostatnie wpisy z timeline'u.
+-   `POST /memory/context`: Zaktualizuj pamięć kontekstową.
+-   `POST /memory/backup`: Stwórz backup całej pamięci.
+-   `GET /memory/persons/{name}`: Pobierz profil osoby.
+-   `GET /health`: Sprawdź stan aplikacji.
+-   `GET /version`: Sprawdź wersję i hash commita.
+
+---
+
+*Ten projekt to krok w stronę prawdziwej, świadomej AI. Rozwijajmy go dalej.*
