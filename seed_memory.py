@@ -16,7 +16,17 @@ from duckduckgo_search import DDGS
 from readability import Document
 
 from llm_simple import chat as llm_chat
-from memory import get_memory
+
+try:
+    from memory import get_memory
+except ImportError:
+    # Jeśli chcesz użyć prawdziwej pamięci, zaimplementuj funkcję get_memory w memory.py
+    # lub zamień poniższą atrapę na właściwy import/funkcję.
+    def get_memory():
+        class DummyMemory:
+            def add_fact(self, text, conf, tags):
+                print(f"FAKT (symulacja): {text} | conf={conf} | tags={tags}")
+        return DummyMemory()
 
 # Konfiguracja
 MAX_RESULTS_PER_TOPIC = 7  # Zwiększono liczbę analizowanych wyników

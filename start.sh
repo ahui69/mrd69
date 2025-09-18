@@ -15,6 +15,7 @@ pip install --upgrade pip > /dev/null
 echo "Instalowanie zależności z pyproject.toml..."
 pip install .
 
+
 echo "Instalowanie dodatkowych pakietów (LangChain, AI, Pamięć)..."
 pip install langchain langchain-openai openai sentence-transformers scikit-learn networkx uvicorn
 
@@ -41,6 +42,6 @@ echo "--- 🛑 Zatrzymywanie starych procesów serwera ---"
 pkill -f uvicorn || true
 sleep 2
 
-echo "--- ▶️ Uruchamianie serwera Mordzix ---"
-echo "Serwer będzie dostępny pod adresem http://<TWÓJ_IP_RUNPOD>:5959"
+echo "--- ▶️ Uruchamianie spython3 -m uvicorn main:app --host 0.0.0.0 --port 5959
+
 python3 -m uvicorn main:app --host 0.0.0.0 --port 5959

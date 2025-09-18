@@ -19,6 +19,7 @@ dependencies = [
     "scikit-learn==1.4.2",
     "networkx==3.3",
     "loguru", # Lepsze logi
+    "tenacity==8.2.3", # Do inteligentnego ponawiania prób
 ]
 
 [project.optional-dependencies]
