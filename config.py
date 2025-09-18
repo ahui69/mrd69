@@ -22,6 +22,7 @@ CHAT_TEMPERATURE: float = float(os.getenv("CHAT_TEMPERATURE", "0.7"))
 
 # === Integracje ===
 USE_RUNPOD: bool = os.getenv("USE_RUNPOD", "False").lower() in ("true", "1", "t")
+RUNPOD_PERSIST_DIR: str = os.getenv("RUNPOD_PERSIST_DIR", "runpod_data")
 
 # === Bezpieczeństwo ===
 # W produkcji ustaw na jawną listę domen, np. "https://twoja-domena.com,http://localhost:3000"

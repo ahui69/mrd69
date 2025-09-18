@@ -18,9 +18,12 @@ def load_seed_to_memory():
     count = 0
     with SEED_PATH.open("r", encoding="utf-8") as f:
         for line in f:
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
             try:
                 data = json.loads(line)
-                text = data.get("text")
+                text = data.get("text") or data.get("fact")
                 meta = data.get("meta", {})
                 tags = data.get("tags", ["seed", "sq3"])
                 score = float(data.get("score", 0.95))
@@ -28,7 +31,7 @@ def load_seed_to_memory():
                     mem.add_fact(text, meta_data={"tags": tags, **meta}, score=score)
                     count += 1
             except Exception as e:
-                print(f"Błąd w linii: {line.strip()}\n{e}")
+                print(f"Błąd w linii: {line}\n{e}")
     print(f"Zaimportowano {count} rekordów z {SEED_PATH}")
 
 if __name__ == "__main__":
