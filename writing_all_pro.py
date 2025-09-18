@@ -1,7 +1,8 @@
+
 """
 writing_all_pro.py — PRO/ULTRA writer z darmowym RAG i integracjami.
 
-Zasady:
+Główne zasady:
 - Nie modyfikuje: memory.py, psychika.py, autonauka.py, crypto_advisor_full.py.
 - Integracje wykrywane dynamicznie i bezpieczne (try/except + hasattr).
 - MAIN LLM: DeepInfra (OpenAI-compatible). MINI: Gemini flash lub mini OpenAI-compatible.
@@ -10,9 +11,11 @@ Zasady:
 - Ulepszenia: spójny retry, cache wyników web (TTL), inline citations,
   mocniejszy ngram_guard, eventy psychika/autonauka, komenda CLI `assist`.
 
-ENV: LLM_BASE_URL, LLM_API_KEY, LLM_MODEL, GEMINI_API_KEY|VERTEX_GEMINI_KEY, GEMINI_MODEL,
-     WEB_HTTP_TIMEOUT, WEB_USER_AGENT, WRITER_OUT_DIR
-cieżka: /workspace/mrd69
+Zmienne środowiskowe:
+- LLM_BASE_URL, LLM_API_KEY, LLM_MODEL, GEMINI_API_KEY|VERTEX_GEMINI_KEY, GEMINI_MODEL,
+  WEB_HTTP_TIMEOUT, WEB_USER_AGENT, WRITER_OUT_DIR
+
+Ścieżka: /workspace/mrd69
 """
 
 from __future__ import annotations
@@ -54,30 +57,40 @@ CACHE_TTL_S = int(os.getenv("WEB_CACHE_TTL_S", "86400"))  # 24h
 
 
 def _now_ms() -> int:
+
+    """Zwraca aktualny czas w milisekundach."""
     return int(time.time() * 1000)
 
 
 def _now_s() -> int:
+
+    """Zwraca aktualny czas w sekundach."""
     return int(time.time())
 
 
 def _slug(s: str, max_len: int = 80) -> str:
+
+    """Tworzy slug (przyjazny URL) z podanego tekstu."""
     s = unicodedata.normalize("NFKD", (s or "")).encode("ascii", "ignore").decode("ascii")
     s = re.sub(r"[^a-zA-Z0-9]+", "-", s).strip("-").lower()
     return s[:max_len] or "item"
 
 
 def _short(txt: str, n: int = 160) -> str:
+
+    """Skraca tekst do n znaków, dodając wielokropek jeśli za długi."""
     t = (txt or "").strip().replace("\n", " ")
     return (t[: n - 1] + "...") if len(t) > n else t
 
 
 def _save(
+
     payload: dict[str, Any],
     base_dir: Path = OUT_DIR,
     prefix: str = "doc",
     ext: str = "md",
-) -> dict[str, Any]:
+) -> dict[str, str]:
+    """Zapisuje tekst i metadane do pliku oraz pliku .json z metadanymi."""
     base_dir.mkdir(parents=True, exist_ok=True)
     name = f"{prefix}_{_now_ms()}.{ext}"
     p = base_dir / name
@@ -90,11 +103,13 @@ def _save(
 
 
 def export_pdf(text: str, out_path: str) -> str | None:
+
+    """Eksportuje tekst do pliku PDF. Zwraca ścieżkę lub None przy błędzie."""
     try:
         from reportlab.lib.pagesizes import A4
         from reportlab.lib.units import cm
         from reportlab.pdfgen import canvas
-    except Exception:
+    except ImportError:
         return None
     c = canvas.Canvas(out_path, pagesize=A4)
     w, h = A4
@@ -338,7 +353,7 @@ def _get_json(url: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
             headers={"Accept": "application/json"},
             timeout=WEB_TIMEOUT,
         )
-        if r.status_code == 404:
+        if r.status_code == HTTP_NOT_FOUND:
             _cache_put(url, params, {})
             return {}
         r.raise_for_status()
@@ -355,7 +370,7 @@ def _get_text(url: str) -> str:
         return cached
     try:
         r = _HTTP.get(url, timeout=WEB_TIMEOUT)
-        if r.status_code >= 400:
+        if r.status_code >= HTTP_BAD_REQUEST:
             return ""
         t = r.text
         t = re.sub(r"(?is)<script.*?>.*?</script>", " ", t)
@@ -410,14 +425,14 @@ def mini_llm_text(prompt: str, max_tokens: int = 256, temperature: float = 0.3) 
         return ""
 
     # Używamy modelu Qwen 4B
-    MINI_BASE = (os.getenv("MINI_LLM_BASE_URL") or os.getenv("LLM_BASE_URL") or "").rstrip("/")
-    MINI_KEY = os.getenv("MINI_LLM_API_KEY") or os.getenv("LLM_API_KEY") or ""
-    MINI_MODEL = os.getenv("MINI_LLM_MODEL", "Qwen/Qwen2.5-4B-Instruct")
-    if MINI_BASE and MINI_KEY:
+    mini_base = (os.getenv("MINI_LLM_BASE_URL") or os.getenv("LLM_BASE_URL") or "").rstrip("/")
+    mini_key = os.getenv("MINI_LLM_API_KEY") or os.getenv("LLM_API_KEY") or ""
+    mini_model = os.getenv("MINI_LLM_MODEL", "Qwen/Qwen2.5-4B-Instruct")
+    if mini_base and mini_key:
         try:
-            url = MINI_BASE + "/chat/completions"
+            url = mini_base + "/chat/completions"
             mini_body: dict[str, object] = {
-                "model": MINI_MODEL,
+                "model": mini_model,
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": temperature,
                 "max_tokens": max_tokens,
@@ -425,13 +440,13 @@ def mini_llm_text(prompt: str, max_tokens: int = 256, temperature: float = 0.3) 
             r = _HTTP.post(
                 url,
                 headers={
-                    "Authorization": f"Bearer {MINI_KEY}",
+                    "Authorization": f"Bearer {mini_key}",
                     "Content-Type": "application/json",
                 },
                 json=mini_body,
                 timeout=WEB_TIMEOUT,
             )
-            if r.status_code < 400:
+            if r.status_code < HTTP_BAD_REQUEST:
                 jj = r.json()
                 txt = (
                     ((jj.get("choices") or [{}])[0].get("message") or {}).get("content", "").strip()
@@ -491,15 +506,16 @@ def _join(ss: list[str]) -> str:
 
 def _cadence(ss: list[str], mode: str, chaos: float) -> list[str]:
     out = []
-    for s in ss:
-        if mode in ("mix", "short") and len(s) > 120:
+    for s_ in ss:
+        s = s_
+        if mode in ("mix", "short") and len(s) > MAX_SHORT_LEN:
             s = re.sub(r",\s+", ". ", s, count=1)
-        if mode in ("mix", "long") and len(s) < 40 and random.random() < 0.4 + chaos * 0.3:
+        if mode in ("mix", "long") and len(s) < MIN_LONG_LEN and random.random() < 0.4 + chaos * 0.3:
             s = s.rstrip(".?!") + ", prawda?"
         if random.random() < chaos * 0.2:
             s = s.replace(" i ", ", i ")
         out.append(s)
-    if mode in ("mix", "short") and len(out) > 2 and random.random() < 0.5:
+    if mode in ("mix", "short") and len(out) > 2 and random.random() < SHORT_INSERT_PROB:
         out.insert(max(1, len(out) // 3), "Serio.")
     return out
 

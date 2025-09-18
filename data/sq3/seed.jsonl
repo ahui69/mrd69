@@ -1,0 +1,4 @@
+# Przykładowy plik seed dla pamięci sq3
+# Możesz tu umieścić dane startowe w formacie JSONL
+# Przykład:
+# {"user": "admin", "memory": "To jest przykładowa wiedza startowa."}

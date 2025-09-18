@@ -127,183 +127,54 @@ except ImportError:
 
 
 @dataclass
+
 class ChatMessage:
     """Wiadomość w czacie z pełnym kontekstem."""
-
-    id: str
-    thread_id: str
-    user_id: str
-    content: str
-    message_type: str = "text"  # text, voice, image, file, system
-    timestamp: float = None
-    status: str = "sent"  # sending, sent, delivered, error
-    metadata: dict[str, Any] = None
-    attachments: list[dict[str, Any]] = None
-
-    def __post_init__(self):
-        if self.timestamp is None:
-            self.timestamp = time.time()
-        if self.metadata is None:
-            self.metadata = {}
-        if self.attachments is None:
-            self.attachments = []
+    def __init__(self, id: str, thread_id: str, user_id: str, content: str, message_type: str = "text", timestamp: float = None, status: str = "sent", metadata: dict = None, attachments: list = None):
+        self.id = id
+        self.thread_id = thread_id
+        self.user_id = user_id
+        self.content = content
+        self.message_type = message_type
+        self.timestamp = timestamp if timestamp is not None else time.time()
+        self.status = status
+        self.metadata = metadata if metadata is not None else {}
+        self.attachments = attachments if attachments is not None else []
 
 
 @dataclass
+
 class ChatThread:
     """Wątek rozmowy z pamięcią kontekstu."""
+    def __init__(self, id: str, user_id: str, title: str, created_at: float = None, last_activity: float = None, message_count: int = 0, context_summary: str = "", personality_mode: str = "mordzix"):
+        self.id = id
+        self.user_id = user_id
+        self.title = title
+        self.created_at = created_at if created_at else time.time()
+        self.last_activity = last_activity if last_activity else time.time()
+        self.message_count = message_count
+        self.context_summary = context_summary
+        self.personality_mode = personality_mode
 
-    id: str
-    user_id: str
-    title: str
-    created_at: float
-    last_activity: float
-    message_count: int = 0
-    context_summary: str = ""
-    personality_mode: str = "mordzix"  # mordzix, professional, casual
-
-    def __post_init__(self):
-        if not self.created_at:
-            self.created_at = time.time()
-        if not self.last_activity:
-            self.last_activity = time.time()
 
 
 class MordzixPersonality:
     """System osobowości bez kagańca - prawdziwy ziomek."""
-
     def __init__(self):
         self.slang_phrases = [
             "No kurde, mordo!",
             "Ziomek!",
             "Bestia!",
             "No i git!",
-           """
-MORDZIX CORE - Najlepsza Platforma AI
-=====================================
-
-Ziomek od wszystkiego - bez kagańca, bez filtrów, z mózgiem bestii.
-Łączy crypto_advisor, travelguide, autonauka, programista w jeden potężny system.
-
-Features:
-🚀 Chat bez ograniczeń z STM/LTM kontekstem 100+ wersów
-🚀 Real-time crypto monitoring z alertami w czacie
-🚀 Travel planning z mapami i trasami
-🚀 Code review i programming mentor
-🚀 Learning system z spaced repetition
-🚀 Voice STT/TTS integration
-🚀 File upload/download z media processing
-🚀 Offline sync z auto-retry
-🚀 WebSocket real-time connections
-🚀 IO Pipeline event bus system
-🚀 Multi-provider image generation
-🚀 Reliability architecture with retry policies
-"""
-
-import asyncio
-import json
-import time
-import uuid
-from collections import defaultdict
-from dataclasses import dataclass
-from datetime import datetime
-from pathlib import Path
-from typing import Any
-
-from fastapi import WebSocket
-
-# Import wszystkich modułów
-import crypto_advisor_full
-import config
-from memory import ContextType, Memory, MoodType, get_advanced_memory
-from loguru import logger as log
-
-# Inicjalizacja zaawansowanego systemu pamięci
-advanced_memory = get_advanced_memory()
-
-# === PSYCHIKA & ADVANCED AI MODULES ===
-try:
-    import psychika  # Decision-making & affect system
-
-    PSYCHIKA_AVAILABLE = True
-except ImportError:
-    print("🧠 Psychika not available - using basic responses")
-    PSYCHIKA_AVAILABLE = False
-
-try:
-    import kimi_client  # Kimi-K2-Instruct model
-
-    KIMI_AVAILABLE = True
-except ImportError:
-    print("🤖 Kimi not available - using basic LLM")
-    KIMI_AVAILABLE = False
-
-# === IO PIPELINE & EVENT BUS ===
-try:
-    import io_pipeline  # Event bus system
-
-    IO_PIPELINE_AVAILABLE = True
-except ImportError:
-    print("📡 IO Pipeline not available - using basic logging")
-    IO_PIPELINE_AVAILABLE = False
-
-# === IMAGE GENERATION ===
-try:
-    import images_client  # Multi-provider image generation
-
-    IMAGES_AVAILABLE = True
-except ImportError:
-    print("🎨 Images client not available - text only mode")
-    IMAGES_AVAILABLE = False
-
-# === SEED MEMORY & PROMPTS ===
-try:
-    import prompt  # Advanced prompt management
-    import seed_memory  # Memory seeding system
-
-    SEED_MEMORY_AVAILABLE = True
-    PROMPT_AVAILABLE = True
-except ImportError:
-    print("🌱 Seed memory/prompts not available - using basic system")
-    SEED_MEMORY_AVAILABLE = False
-    PROMPT_AVAILABLE = False
-except ImportError:
-    print("🤖 Kimi not available - using default LLM")
-    KIMI_AVAILABLE = False
-
-try:
-    import seed_memory  # Memory seeding system
-
-    SEED_MEMORY_AVAILABLE = True
-except ImportError:
-    print("🌱 Seed memory not available")
-    SEED_MEMORY_AVAILABLE = False
-
-try:
-    import prompt  # System prompts & persona
-    from prompt import SYSTEM_PROMPT
-
-    PROMPT_SYSTEM_AVAILABLE = True
-except ImportError:
-    print("📝 Advanced prompts not available - using basic")
-    SYSTEM_PROMPT = "You are Mordzix - helpful AI assistant."
-    PROMPT_SYSTEM_AVAILABLE = False
-
-try:
-    import io_pipeline  # Event bus & metrics
-
-    IO_PIPELINE_AVAILABLE = True
-except ImportError:
-    print("🚇 IO Pipeline not available - no event bus")
-    IO_PIPELINE_AVAILABLE = False
-
-try:
-    import images_client  # Multi-provider image generation
-
-    IMAGES_AVAILABLE = True
-except ImportError:
-    print("🎨 Images client not available - no image generation")
-    IMAGES_AVAILABLE = False
+        ]
+    def enhance_response(self, response: str, context: dict) -> str:
+        # Dodaj losowy zwrot slangowy na początek lub koniec odpowiedzi
+        import random
+        if random.random() > 0.7:
+            return f"{random.choice(self.slang_phrases)} {response}"
+        elif random.random() < 0.3:
+            return f"{response} {random.choice(self.slang_phrases)}"
+        return response
 
 
 @dataclass

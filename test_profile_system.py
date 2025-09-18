@@ -4,7 +4,10 @@ Test systemu personalizacji dla TravelGuide.
 Demonstracja funkcji profilu podróżnika bez zależności od zewnętrznych API.
 """
 
+
 import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent))
 
 from travelguide import (
     _categorize_attractions,

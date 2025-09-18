@@ -22,13 +22,13 @@
   "disliked_attraction_types": [],
   "weather_preferences": {},
   "time_preferences": {},
-  "trips_count": 1,
-  "last_updated": 1757986214.75472,
+  "trips_count": 3,
+  "last_updated": 1758229798.5629134,
   "learning_scores": {
-    "museum": 0.6,
-    "nature": 0.55,
-    "nightlife": 0.45,
-    "historical": 0.6,
+    "museum": 0.7999999999999999,
+    "nature": 0.6500000000000001,
+    "nightlife": 0.35000000000000003,
+    "historical": 0.7999999999999999,
     "shopping": 0.5
   }
 }
