@@ -20,67 +20,103 @@
 <body>
     <div id="app-container">
         <!-- Panel boczny z historią rozmów -->
-        <div id="history-panel">
-            <h3>Historia Rozmów</h3>
-            <ul id="history-list"></ul>
-        </div>
-        
-        <!-- Panel map -->
-        <div id="maps-panel">
-            <div class="maps-header">
-                <h3>Mapy i Trasy</h3>
-                <button id="maps-close" class="panel-close">×</button>
-            </div>
-            <div class="maps-search">
-                <div class="maps-input-group">
-                    <input type="text" id="maps-start" placeholder="Punkt startowy" />
-                    <button class="maps-location-btn" id="maps-gps-btn" title="Użyj mojej lokalizacji">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="8"/>
-                            <circle cx="12" cy="12" r="2"/>
-                            <line x1="12" y1="2" x2="12" y2="4"/>
-                            <line x1="12" y1="20" x2="12" y2="22"/>
-                            <line x1="2" y1="12" x2="4" y2="12"/>
-                            <line x1="20" y1="12" x2="22" y2="12"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="maps-input-group">
-                    <input type="text" id="maps-end" placeholder="Cel podróży" />
-                    <button class="maps-swap-btn" id="maps-swap-btn" title="Zamień A/B">⇅</button>
-                    <select id="maps-mode" title="Tryb trasy">
-                        <option value="driving" selected>Samochód</option>
-                        <option value="walking">Pieszo</option>
-                        <option value="cycling">Rower</option>
-                    </select>
-                    <button class="maps-search-btn" id="maps-route-btn">Wyznacz trasę</button>
-                </div>
-            </div>
-            <div id="maps-container"></div>
-            <div id="route-info"></div>
-            <div id="route-steps"></div>
-        </div>
-
-        <!-- Panel wyszukiwania wiedzy -->
-        <div id="search-panel">
-            <div class="search-header">
-                <h3>Wyszukiwanie Wiedzy</h3>
-                <button id="search-close" class="panel-close">×</button>
-            </div>
-            <div class="search-form">
-                <div class="search-input-group">
-                    <input type="text" id="search-query" placeholder="Wpisz zapytanie..." />
-                    <button class="search-btn" id="search-btn">Szukaj</button>
-                </div>
-                <div class="search-options">
-                    <label>
-                        <input type="checkbox" id="search-auto" checked />
-                        Automatycznie szukaj dla pytań
-                    </label>
-                </div>
-            </div>
-            <div id="search-results"></div>
-        </div>
+        <!DOCTYPE html>
+        <html lang="pl">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Mordzix AI Platforma</title>
+            <link rel="stylesheet" href="style.css">
+            <style>
+                body { font-family: system-ui, sans-serif; background: #181c20; color: #f2f2f2; margin: 0; }
+                header { background: #23272e; padding: 24px 0 12px 0; text-align: center; box-shadow: 0 2px 8px #0002; }
+                h1 { margin: 0; font-size: 2.2rem; letter-spacing: 2px; }
+                nav { margin: 24px 0 0 0; display: flex; justify-content: center; gap: 24px; }
+                nav button { background: #23272e; color: #f2f2f2; border: none; padding: 12px 28px; font-size: 1.1rem; border-radius: 8px 8px 0 0; cursor: pointer; transition: background 0.2s; }
+                nav button.active, nav button:hover { background: #2e3440; color: #fff; }
+                main { max-width: 900px; margin: 32px auto; background: #23272e; border-radius: 12px; box-shadow: 0 4px 32px #0004; padding: 32px; min-height: 400px; }
+                .tab-content { display: none; }
+                .tab-content.active { display: block; }
+                footer { text-align: center; color: #888; margin: 48px 0 16px 0; font-size: 0.95rem; }
+                @media (max-width: 700px) { main { padding: 12px; } nav button { padding: 8px 10px; font-size: 1rem; } }
+            </style>
+        </head>
+        <body>
+            <header>
+                <h1>Mordzix AI Platforma</h1>
+                <nav>
+                    <button class="tab-btn active" data-tab="chat">Chat</button>
+                    <button class="tab-btn" data-tab="crypto">Crypto</button>
+                    <button class="tab-btn" data-tab="travel">Travel</button>
+                    <button class="tab-btn" data-tab="writing">Pisanie</button>
+                    <button class="tab-btn" data-tab="profile">Profil</button>
+                </nav>
+            </header>
+            <main>
+                <section id="tab-chat" class="tab-content active">
+                    <h2>Chat AI</h2>
+                    <p>Rozmawiaj z Mordzixem – Twoim asystentem AI bez kagańca. Wsparcie dla kodu, nauki, biznesu, kreatywności i więcej.</p>
+                    <textarea id="chat-input" rows="3" style="width:100%;margin:12px 0;resize:vertical;"></textarea>
+                    <button onclick="sendChat()">Wyślij</button>
+                    <div id="chat-log" style="margin-top:24px;max-height:300px;overflow-y:auto;"></div>
+                </section>
+                <section id="tab-crypto" class="tab-content">
+                    <h2>Crypto</h2>
+                    <p>Monitoruj kursy, analizuj portfele, generuj alerty i raporty. Integracja z <b>crypto_advisor_full</b>.</p>
+                    <div id="crypto-content">(Funkcjonalność w przygotowaniu)</div>
+                </section>
+                <section id="tab-travel" class="tab-content">
+                    <h2>Travel</h2>
+                    <p>Planuj podróże, trasy, hotele i atrakcje z AI. Integracja z <b>travelguide</b>.</p>
+                    <div id="travel-content">(Funkcjonalność w przygotowaniu)</div>
+                </section>
+                <section id="tab-writing" class="tab-content">
+                    <h2>Pisanie</h2>
+                    <p>Generuj artykuły, blogi, opowiadania, SEO i więcej. Integracja z <b>writing_all_pro</b>.</p>
+                    <div id="writing-content">(Funkcjonalność w przygotowaniu)</div>
+                </section>
+                <section id="tab-profile" class="tab-content">
+                    <h2>Profil</h2>
+                    <p>Twoje dane, statystyki, personalizacja i ustawienia AI.</p>
+                    <div id="profile-content">(Funkcjonalność w przygotowaniu)</div>
+                </section>
+            </main>
+            <footer>
+                &copy; 2025 Mordzix AI &mdash; Platforma stworzona przez ziomka dla ziomków.<br>
+                <span style="font-size:0.9em;">Wersja: <span id="app-version">(ładowanie...)</span></span>
+            </footer>
+            <script>
+                // Zakładki
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                        btn.classList.add('active');
+                        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+                    });
+                });
+                // Chat demo (frontend-only)
+                function sendChat() {
+                    const input = document.getElementById('chat-input');
+                    const log = document.getElementById('chat-log');
+                    if (!input.value.trim()) return;
+                    const userMsg = `<div style='color:#8cf'>Ty: ${input.value}</div>`;
+                    log.innerHTML += userMsg;
+                    setTimeout(() => {
+                        log.innerHTML += `<div style='color:#ffb'>Mordzix: <i>To jest przykładowa odpowiedź AI.</i></div>`;
+                        log.scrollTop = log.scrollHeight;
+                    }, 600);
+                    input.value = '';
+                }
+                // Wersja z backendu (jeśli API dostępne)
+                fetch('/version').then(r=>r.json()).then(d=>{
+                    document.getElementById('app-version').textContent = d.version || 'dev';
+                }).catch(()=>{
+                    document.getElementById('app-version').textContent = 'dev';
+                });
+            </script>
+        </body>
+        </html>
 
         <!-- Główny kontener czatu -->
         <div id="chat-container">
