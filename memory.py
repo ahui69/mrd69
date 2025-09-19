@@ -1199,7 +1199,7 @@ class Memory:
                             print("Ostrzeżenie: Nie można dodać do indeksu FTS")
 
                 conn.commit()
-                self._meta_event("ltm_upsert", {"id": fid})
+                # self._meta_event("ltm_upsert", {"id": fid})
                 return fid
             finally:
                 conn.close()
@@ -1238,7 +1238,7 @@ class Memory:
                     except Exception:
                         pass
                 conn.commit()
-                self._meta_event("ltm_delete", {"id": tid})
+                # self._meta_event("ltm_delete", {"id": tid})
                 return True
             finally:
                 conn.close()
@@ -1318,7 +1318,7 @@ class Memory:
                         # Jeśli osadzanie nie powiedzie się dla partii, przerwij
                         break
 
-                self._meta_event("rebuild_embeddings", {"updated": updated})
+                # self._meta_event("rebuild_embeddings", {"updated": updated})
                 return {"ok": True, "updated": updated}
             finally:
                 conn.close()
@@ -1334,7 +1334,7 @@ class Memory:
                     (user or "", assistant or ""),
                 )
                 conn.commit()
-                self._meta_event("stm_add", {"len": 1})
+                # self._meta_event("stm_add", {"len": 1})
             finally:
                 conn.close()
 
@@ -1411,7 +1411,7 @@ class Memory:
             finally:
                 conn.close()
 
-        self._meta_event("stm_flush", {"inserted": ins, "merged": mrg})
+    # self._meta_event("stm_flush", {"inserted": ins, "merged": mrg})
         return {"ok": True, "facts": ins + mrg, "inserted": ins, "merged": mrg}
 
     def process_stm_window(self, window_size: int = 30) -> dict[str, Any]:
@@ -1454,13 +1454,10 @@ Przykład:
                 return {"ok": False, "reason": "llm_did_not_return_a_list"}
 
         except (json.JSONDecodeError, IndexError) as e:
-            self._meta_event(
-                "stm_process_window_error",
-                {"error": str(e), "raw_response": response_raw},
-            )
+            # self._meta_event("stm_process_window_error", {"error": str(e), "raw_response": response_raw})
             return {"ok": False, "reason": f"json_parsing_failed: {e}"}
         except Exception as e:
-            self._meta_event("stm_process_window_error", {"error": str(e)})
+            # self._meta_event("stm_process_window_error", {"error": str(e)})
             return {"ok": False, "reason": f"llm_call_failed: {e}"}
 
         if not extracted_texts:
@@ -1480,10 +1477,10 @@ Przykład:
             else:
                 ins += 1
 
-        self._meta_event(
-            "stm_process_window",
-            {"inserted": ins, "merged": mrg, "window_size": window_size},
-        )
+        # self._meta_event(
+        #     "stm_process_window",
+        #     {"inserted": ins, "merged": mrg, "window_size": window_size},
+        # )
         return {"ok": True, "facts": ins + mrg, "inserted": ins, "merged": mrg}
 
     # ====== Episodes ====== (skrócone - pełne w części 4)
@@ -1497,7 +1494,7 @@ Przykład:
                     (user or "", assistant or ""),
                 )
                 conn.commit()
-                self._meta_event("episode_add", {})
+                # self._meta_event("episode_add", {})
             finally:
                 conn.close()
 
@@ -2116,3 +2113,4 @@ def get_advanced_memory() -> AdvancedMemorySystem:
 
 # ------------------------- Singleton (istniejący) -------------------------
 # ... (reszta kodu bez zmian) ...
+''
