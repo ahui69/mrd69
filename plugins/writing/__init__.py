@@ -1,1 +1,0 @@
-# Writing plugins package
