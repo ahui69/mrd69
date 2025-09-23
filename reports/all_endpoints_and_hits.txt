@@ -1,0 +1,450 @@
+/workspace/mrd69/memory_api.py:15:from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Query
+/workspace/mrd69/memory_api.py:20:    from .memory import get_memory  # type: ignore
+/workspace/mrd69/memory_api.py:23:    from memory import get_memory  # type: ignore
+/workspace/mrd69/memory_api.py:89:router = APIRouter(prefix="/api/memory", tags=["memory"])
+/workspace/mrd69/memory_api.py:93:    return get_memory()
+/workspace/mrd69/fix_writing_all_pro.py:250:        # Preferuj aktualny kontrakt poprzez singleton `get_memory()`
+/workspace/mrd69/fix_writing_all_pro.py:251:        get_mem = getattr(memory, "get_memory", None)
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/jupyter_server/gateway/managers.py:768:        self.response_router = Thread(target=self._route_responses)
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/oauth2.py:38:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/oauth2.py:41:    @app.post("/login")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/oauth2.py:180:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/oauth2.py:183:    @app.post("/login")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/http.py:119:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/http.py:124:    @app.get("/users/me")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/http.py:239:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/http.py:244:    @app.get("/users/me")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/http.py:343:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/http.py:348:    @app.get("/users/me")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/api_key.py:44:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/api_key.py:49:    @app.get("/items/")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/api_key.py:136:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/api_key.py:141:    @app.get("/items/")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/api_key.py:224:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/security/api_key.py:229:    @app.get("/items/")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:602:class APIRouter(routing.Router):
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:604:    `APIRouter` class, used to group *path operations*, for example to structure
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:606:    in another `APIRouter` (ultimately included in the app).
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:614:    from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:616:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:617:    router = APIRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:970:    def api_route(
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:1096:        from fastapi import APIRouter, FastAPI, WebSocket
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:1098:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:1099:        router = APIRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:1131:        router: Annotated["APIRouter", Doc("The `APIRouter` to include.")],
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:1242:        Include another `APIRouter` in the same current `APIRouter`.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:1250:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:1252:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:1253:        internal_router = APIRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:1254:        users_router = APIRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:1711:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:1713:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:1714:        router = APIRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:2088:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:2095:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:2096:        router = APIRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:2470:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:2477:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:2478:        router = APIRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:2852:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:2854:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:2855:        router = APIRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:3229:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:3231:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:3232:        router = APIRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:3606:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:3613:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:3614:        router = APIRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:3988:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:3995:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:3996:        router = APIRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:4370:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:4377:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/routing.py:4378:        router = APIRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/param_functions.py:296:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/param_functions.py:299:    @app.get("/items/{item_id}")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/param_functions.py:2265:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/param_functions.py:2272:    @app.get("/items/")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/param_functions.py:2351:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/param_functions.py:2353:    @app.get("/users/me/items/")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/exceptions.py:24:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/exceptions.py:29:    @app.get("/items/{item_id}")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/exceptions.py:91:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/exceptions.py:93:    @app.websocket("/items/{item_id}/ws")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/datastructures.py:50:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/datastructures.py:53:    @app.post("/files/")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/datastructures.py:58:    @app.post("/uploadfile/")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/background.py:22:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/background.py:31:    @app.post("/send-notification/{email}")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:48:class FastAPI(Starlette):
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:60:    app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:97:                like `app.get()`, `app.post()`, etc.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:117:                app = FastAPI(title="ChimichangApp")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:138:                app = FastAPI(summary="Deadpond's favorite app. Nuff said.")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:160:                app = FastAPI(
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:200:                app = FastAPI(version="0.0.1")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:223:                app = FastAPI(openapi_url="/api/v1/openapi.json")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:235:                * `@app.get("/users/", tags=["users"])`
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:236:                * `@app.get("/items/", tags=["items"])`
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:283:                app = FastAPI(openapi_tags=tags_metadata)
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:322:                app = FastAPI(
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:349:                app = FastAPI(dependencies=[Depends(func_dep_1), Depends(func_dep_2)])
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:369:                app = FastAPI(default_response_class=ORJSONResponse)
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:386:                app = FastAPI(redirect_slashes=True)  # the default
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:388:                @app.get("/items/")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:418:                app = FastAPI(docs_url="/documentation", redoc_url=None)
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:442:                app = FastAPI(docs_url="/documentation", redoc_url="redocumentation")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:497:                `@app.exception_handler()`.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:555:                app = FastAPI(terms_of_service="http://example.com/terms/")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:582:                app = FastAPI(
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:617:                app = FastAPI(
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:657:                app = FastAPI(root_path="/api/v1")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:677:                app = FastAPI(root_path_in_servers=False)
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:712:            Optional[routing.APIRouter],
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:834:                app = FastAPI(openapi_external_docs=external_docs)
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:893:                app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:913:            routing.APIRouter,
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:916:                The `app.webhooks` attribute is an `APIRouter` with the *path
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:923:        ] = webhooks or routing.APIRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:959:        self.router: routing.APIRouter = routing.APIRouter(
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:1143:    def api_route(
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:1261:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:1263:        @app.websocket("/ws")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:1285:        router: Annotated[routing.APIRouter, Doc("The `APIRouter` to include.")],
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:1320:                app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:1361:                app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:1387:                app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:1415:                app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:1458:        Include an `APIRouter` in the same app.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:1470:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:1828:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:1830:        @app.get("/items/")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:2206:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:2208:        @app.put("/items/{item_id}")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:2584:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:2586:        @app.post("/items/")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:2957:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:2959:        @app.delete("/items/{item_id}")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:3330:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:3332:        @app.options("/items/")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:3703:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:3705:        @app.head("/items/", status_code=204)
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:4081:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:4083:        @app.patch("/items/")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:4454:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:4456:        @app.trace("/items/{item_id}")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:4550:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:4553:        @app.middleware("http")
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:4600:        app = FastAPI()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/applications.py:4603:        @app.exception_handler(UnicornException)
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/fastapi/__init__.py:23:from .routing import APIRouter as APIRouter
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/prometheus_fastapi_instrumentator/instrumentation.py:296:                fastapi_app.get(
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/starlette/routing.py:568:        self._router = router
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/starlette/applications.py:75:        self.router = Router(routes, on_startup=on_startup, on_shutdown=on_shutdown, lifespan=lifespan)
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/jedi/inference/value/klass.py:77:    def api_type(self):
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/jedi/inference/compiled/value.py:152:    def api_type(self):
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/jedi/inference/compiled/value.py:347:    def api_type(self):
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/jedi/inference/names.py:81:    def api_type(self):
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/jedi/inference/names.py:256:    def api_type(self):
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/jedi/inference/names.py:288:    def api_type(self):
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/jedi/inference/names.py:613:    def api_type(self):
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:479:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:504:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:519:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:534:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:549:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:566:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:583:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:601:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/textio.py:1569:        @param memoryMap: Memory map returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/process.py:109:        restore_memory_snapshot, get_memory_map, get_mapped_filenames,
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/process.py:1975:        # + Maybe use mquery instead of get_memory_map?
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/process.py:1981:                for mbi in self.get_memory_map(lpBaseAddress, lpBaseAddress + nSize):
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/process.py:2985:    def get_memory_map(self, minAddr=None, maxAddr=None):
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/process.py:3061:        @param memoryMap: (Optional) Memory map returned by L{get_memory_map}.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/process.py:3070:            memoryMap = self.get_memory_map()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/process.py:3189:        memory = self.get_memory_map(minAddr, maxAddr)
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/interactive.py:887:        for mbi in process.get_memory_map():
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/interactive.py:2082:            memoryMap = process.get_memory_map()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/crash.py:557:               See L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/crash.py:635:            self.memoryMap = process.get_memory_map()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/test/routing_test.py:82:        return self.app.get_handler_delegate(request, handler, path_args=[request.path])
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/test/routing_test.py:127:            return app.get_handler_delegate(request, handler)
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/test/routing_test.py:136:        router = CustomRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/test/routing_test.py:194:        router = CustomRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/web.py:2225:        self.wildcard_router = _ApplicationRouter(self, handlers)
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/web.py:2226:        self.default_router = _ApplicationRouter(
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/routing.py:51:    router = CustomRouter()
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/routing.py:88:            return self.app.get_handler_delegate(request, handler, path_args=[request.path])
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/routing.py:90:    router = HTTPMethodRouter(Application())
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/routing.py:110:    router = RuleRouter([
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/routing.py:123:    router = RuleRouter([
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/routing.py:135:    router = RuleRouter([
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/routing.py:143:    router = RuleRouter([
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/routing.py:165:    router = RuleRouter([
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/tornado/routing.py:247:        self.router = router  # type: Router
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/websocket/tests/test_app.py:143:        self.assertEqual(id(app.get_mask_key), id(my_mask_key_func))
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/websockets/sync/router.py:147:        create_router = Router
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/websockets/sync/router.py:149:    router = create_router(url_map, server_name, url_scheme)
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/websockets/asyncio/router.py:151:        create_router = Router
+/workspace/mrd69/.venv/lib64/python3.11/site-packages/websockets/asyncio/router.py:153:    router = create_router(url_map, server_name, url_scheme)
+/workspace/mrd69/.venv/lib/python3.11/site-packages/jupyter_server/gateway/managers.py:768:        self.response_router = Thread(target=self._route_responses)
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/oauth2.py:38:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/oauth2.py:41:    @app.post("/login")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/oauth2.py:180:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/oauth2.py:183:    @app.post("/login")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/http.py:119:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/http.py:124:    @app.get("/users/me")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/http.py:239:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/http.py:244:    @app.get("/users/me")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/http.py:343:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/http.py:348:    @app.get("/users/me")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/api_key.py:44:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/api_key.py:49:    @app.get("/items/")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/api_key.py:136:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/api_key.py:141:    @app.get("/items/")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/api_key.py:224:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/security/api_key.py:229:    @app.get("/items/")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:602:class APIRouter(routing.Router):
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:604:    `APIRouter` class, used to group *path operations*, for example to structure
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:606:    in another `APIRouter` (ultimately included in the app).
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:614:    from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:616:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:617:    router = APIRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:970:    def api_route(
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:1096:        from fastapi import APIRouter, FastAPI, WebSocket
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:1098:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:1099:        router = APIRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:1131:        router: Annotated["APIRouter", Doc("The `APIRouter` to include.")],
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:1242:        Include another `APIRouter` in the same current `APIRouter`.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:1250:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:1252:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:1253:        internal_router = APIRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:1254:        users_router = APIRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:1711:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:1713:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:1714:        router = APIRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:2088:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:2095:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:2096:        router = APIRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:2470:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:2477:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:2478:        router = APIRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:2852:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:2854:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:2855:        router = APIRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:3229:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:3231:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:3232:        router = APIRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:3606:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:3613:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:3614:        router = APIRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:3988:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:3995:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:3996:        router = APIRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:4370:        from fastapi import APIRouter, FastAPI
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:4377:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/routing.py:4378:        router = APIRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/param_functions.py:296:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/param_functions.py:299:    @app.get("/items/{item_id}")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/param_functions.py:2265:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/param_functions.py:2272:    @app.get("/items/")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/param_functions.py:2351:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/param_functions.py:2353:    @app.get("/users/me/items/")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/exceptions.py:24:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/exceptions.py:29:    @app.get("/items/{item_id}")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/exceptions.py:91:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/exceptions.py:93:    @app.websocket("/items/{item_id}/ws")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/datastructures.py:50:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/datastructures.py:53:    @app.post("/files/")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/datastructures.py:58:    @app.post("/uploadfile/")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/background.py:22:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/background.py:31:    @app.post("/send-notification/{email}")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:48:class FastAPI(Starlette):
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:60:    app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:97:                like `app.get()`, `app.post()`, etc.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:117:                app = FastAPI(title="ChimichangApp")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:138:                app = FastAPI(summary="Deadpond's favorite app. Nuff said.")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:160:                app = FastAPI(
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:200:                app = FastAPI(version="0.0.1")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:223:                app = FastAPI(openapi_url="/api/v1/openapi.json")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:235:                * `@app.get("/users/", tags=["users"])`
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:236:                * `@app.get("/items/", tags=["items"])`
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:283:                app = FastAPI(openapi_tags=tags_metadata)
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:322:                app = FastAPI(
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:349:                app = FastAPI(dependencies=[Depends(func_dep_1), Depends(func_dep_2)])
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:369:                app = FastAPI(default_response_class=ORJSONResponse)
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:386:                app = FastAPI(redirect_slashes=True)  # the default
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:388:                @app.get("/items/")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:418:                app = FastAPI(docs_url="/documentation", redoc_url=None)
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:442:                app = FastAPI(docs_url="/documentation", redoc_url="redocumentation")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:497:                `@app.exception_handler()`.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:555:                app = FastAPI(terms_of_service="http://example.com/terms/")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:582:                app = FastAPI(
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:617:                app = FastAPI(
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:657:                app = FastAPI(root_path="/api/v1")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:677:                app = FastAPI(root_path_in_servers=False)
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:712:            Optional[routing.APIRouter],
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:834:                app = FastAPI(openapi_external_docs=external_docs)
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:893:                app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:913:            routing.APIRouter,
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:916:                The `app.webhooks` attribute is an `APIRouter` with the *path
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:923:        ] = webhooks or routing.APIRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:959:        self.router: routing.APIRouter = routing.APIRouter(
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:1143:    def api_route(
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:1261:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:1263:        @app.websocket("/ws")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:1285:        router: Annotated[routing.APIRouter, Doc("The `APIRouter` to include.")],
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:1320:                app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:1361:                app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:1387:                app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:1415:                app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:1458:        Include an `APIRouter` in the same app.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:1470:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:1828:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:1830:        @app.get("/items/")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:2206:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:2208:        @app.put("/items/{item_id}")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:2584:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:2586:        @app.post("/items/")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:2957:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:2959:        @app.delete("/items/{item_id}")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:3330:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:3332:        @app.options("/items/")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:3703:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:3705:        @app.head("/items/", status_code=204)
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:4081:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:4083:        @app.patch("/items/")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:4454:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:4456:        @app.trace("/items/{item_id}")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:4550:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:4553:        @app.middleware("http")
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:4600:        app = FastAPI()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/applications.py:4603:        @app.exception_handler(UnicornException)
+/workspace/mrd69/.venv/lib/python3.11/site-packages/fastapi/__init__.py:23:from .routing import APIRouter as APIRouter
+/workspace/mrd69/.venv/lib/python3.11/site-packages/prometheus_fastapi_instrumentator/instrumentation.py:296:                fastapi_app.get(
+/workspace/mrd69/.venv/lib/python3.11/site-packages/starlette/routing.py:568:        self._router = router
+/workspace/mrd69/.venv/lib/python3.11/site-packages/starlette/applications.py:75:        self.router = Router(routes, on_startup=on_startup, on_shutdown=on_shutdown, lifespan=lifespan)
+/workspace/mrd69/.venv/lib/python3.11/site-packages/jedi/inference/value/klass.py:77:    def api_type(self):
+/workspace/mrd69/.venv/lib/python3.11/site-packages/jedi/inference/compiled/value.py:152:    def api_type(self):
+/workspace/mrd69/.venv/lib/python3.11/site-packages/jedi/inference/compiled/value.py:347:    def api_type(self):
+/workspace/mrd69/.venv/lib/python3.11/site-packages/jedi/inference/names.py:81:    def api_type(self):
+/workspace/mrd69/.venv/lib/python3.11/site-packages/jedi/inference/names.py:256:    def api_type(self):
+/workspace/mrd69/.venv/lib/python3.11/site-packages/jedi/inference/names.py:288:    def api_type(self):
+/workspace/mrd69/.venv/lib/python3.11/site-packages/jedi/inference/names.py:613:    def api_type(self):
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:479:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:504:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:519:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:534:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:549:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:566:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:583:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/util.py:601:        Returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/textio.py:1569:        @param memoryMap: Memory map returned by L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/process.py:109:        restore_memory_snapshot, get_memory_map, get_mapped_filenames,
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/process.py:1975:        # + Maybe use mquery instead of get_memory_map?
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/process.py:1981:                for mbi in self.get_memory_map(lpBaseAddress, lpBaseAddress + nSize):
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/process.py:2985:    def get_memory_map(self, minAddr=None, maxAddr=None):
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/process.py:3061:        @param memoryMap: (Optional) Memory map returned by L{get_memory_map}.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/process.py:3070:            memoryMap = self.get_memory_map()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/process.py:3189:        memory = self.get_memory_map(minAddr, maxAddr)
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/interactive.py:887:        for mbi in process.get_memory_map():
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/interactive.py:2082:            memoryMap = process.get_memory_map()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/crash.py:557:               See L{Process.get_memory_map}.
+/workspace/mrd69/.venv/lib/python3.11/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/winappdbg/crash.py:635:            self.memoryMap = process.get_memory_map()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/test/routing_test.py:82:        return self.app.get_handler_delegate(request, handler, path_args=[request.path])
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/test/routing_test.py:127:            return app.get_handler_delegate(request, handler)
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/test/routing_test.py:136:        router = CustomRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/test/routing_test.py:194:        router = CustomRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/web.py:2225:        self.wildcard_router = _ApplicationRouter(self, handlers)
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/web.py:2226:        self.default_router = _ApplicationRouter(
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/routing.py:51:    router = CustomRouter()
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/routing.py:88:            return self.app.get_handler_delegate(request, handler, path_args=[request.path])
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/routing.py:90:    router = HTTPMethodRouter(Application())
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/routing.py:110:    router = RuleRouter([
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/routing.py:123:    router = RuleRouter([
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/routing.py:135:    router = RuleRouter([
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/routing.py:143:    router = RuleRouter([
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/routing.py:165:    router = RuleRouter([
+/workspace/mrd69/.venv/lib/python3.11/site-packages/tornado/routing.py:247:        self.router = router  # type: Router
+/workspace/mrd69/.venv/lib/python3.11/site-packages/websocket/tests/test_app.py:143:        self.assertEqual(id(app.get_mask_key), id(my_mask_key_func))
+/workspace/mrd69/.venv/lib/python3.11/site-packages/websockets/sync/router.py:147:        create_router = Router
+/workspace/mrd69/.venv/lib/python3.11/site-packages/websockets/sync/router.py:149:    router = create_router(url_map, server_name, url_scheme)
+/workspace/mrd69/.venv/lib/python3.11/site-packages/websockets/asyncio/router.py:151:        create_router = Router
+/workspace/mrd69/.venv/lib/python3.11/site-packages/websockets/asyncio/router.py:153:    router = create_router(url_map, server_name, url_scheme)
+/workspace/mrd69/api_bridge.py:5:from fastapi import FastAPI, APIRouter, UploadFile, File, Form, Request
+/workspace/mrd69/api_bridge.py:166:app = FastAPI(title="Mordzix API Bridge", version="1.0")
+/workspace/mrd69/api_bridge.py:179:api = APIRouter(prefix="/api")
+/workspace/mrd69/api_bridge.py:266:@app.get("/api/health")
+/workspace/mrd69/server.py:103:app = FastAPI(title="MRD69 API")
+/workspace/mrd69/server.py:127:@app.get("/api/health")
+/workspace/mrd69/server.py:128:def api_health():
+/workspace/mrd69/server.py:137:@app.get("/api/bootstrap")
+/workspace/mrd69/server.py:138:def api_bootstrap():
+/workspace/mrd69/server.py:143:@app.get("/api/history")
+/workspace/mrd69/server.py:144:def api_history():
+/workspace/mrd69/server.py:147:@app.get("/api/history/{chat_id}")
+/workspace/mrd69/server.py:148:def api_history_chat(chat_id: str):
+/workspace/mrd69/server.py:151:@app.post("/api/upload")
+/workspace/mrd69/server.py:152:async def api_upload(file: UploadFile = File(...)):
+/workspace/mrd69/server.py:160:@app.post("/api/chat")
+/workspace/mrd69/server.py:161:def api_chat(req: ChatRequest):
+/workspace/mrd69/writing_all_pro.py:249:        # Preferuj aktualny kontrakt poprzez singleton `get_memory()`
+/workspace/mrd69/writing_all_pro.py:250:        get_mem = getattr(memory, "get_memory", None)
+/workspace/mrd69/programista.py:1313:        app = FastAPI(title="Programista PRO API", version="2.0.0")
+/workspace/mrd69/programista.py:1339:        @app.post("/prog/reply")
+/workspace/mrd69/programista.py:1340:        def api_reply(d: ReplyIn):
+/workspace/mrd69/programista.py:1350:        @app.post("/prog/run")
+/workspace/mrd69/programista.py:1351:        def api_run(d: RunIn):
+/workspace/mrd69/programista.py:1360:        @app.post("/prog/quality")
+/workspace/mrd69/programista.py:1361:        def api_quality(d: QualityIn):
+/workspace/mrd69/programista.py:1364:        @app.post("/prog/learn")
+/workspace/mrd69/programista.py:1365:        def api_learn(d: LearnIn):
+/workspace/mrd69/programista.py:1368:        @app.post("/prog/shell")
+/workspace/mrd69/programista.py:1369:        def api_shell(d: ShellIn):
+/workspace/mrd69/memory.py:1356:def get_memory(namespace: Optional[str]=None)->"Memory":
+/workspace/mrd69/memory.py:1371:app = FastAPI(title="Memory ULTRA+ API", version="1.0") if _HAS_FASTAPI else None
+/workspace/mrd69/memory.py:1374:    mem=get_memory()
+/workspace/mrd69/memory.py:1376:    @app.get("/stats")
+/workspace/mrd69/memory.py:1377:    def api_stats(): return mem.stats()
+/workspace/mrd69/memory.py:1379:    @app.post("/facts/add")
+/workspace/mrd69/memory.py:1380:    def api_add_fact(text: str = Form(...), conf: float = Form(0.6), tags: str = Form("")):
+/workspace/mrd69/memory.py:1385:    @app.get("/facts/list")
+/workspace/mrd69/memory.py:1386:    def api_list_facts(limit: int=50): return mem.list_facts(limit=limit)
+/workspace/mrd69/memory.py:1388:    @app.delete("/facts/{id_or_text}")
+/workspace/mrd69/memory.py:1389:    def api_del_fact(id_or_text: str):
+/workspace/mrd69/memory.py:1392:    @app.get("/recall")
+/workspace/mrd69/memory.py:1393:    def api_recall(q: str, topk: int=6):
+/workspace/mrd69/memory.py:1396:    @app.get("/ctx")
+/workspace/mrd69/memory.py:1397:    def api_ctx(q: str, topk: int=8, limit: int=2200):
+/workspace/mrd69/memory.py:1400:    @app.post("/stm/turn")
+/workspace/mrd69/memory.py:1401:    def api_stm_turn(user: str = Form(""), assistant: str = Form("")):
+/workspace/mrd69/memory.py:1409:    @app.post("/stm/flush")
+/workspace/mrd69/memory.py:1410:    def api_stm_flush(): return mem.force_flush_stm()
+/workspace/mrd69/memory.py:1412:    @app.post("/reflect")
+/workspace/mrd69/memory.py:1413:    def api_reflect(): return mem.reflect_now()
+/workspace/mrd69/memory.py:1415:    @app.get("/predict")
+/workspace/mrd69/memory.py:1416:    def api_predict(): return mem.predict_next_intent()
+/workspace/mrd69/memory.py:1418:    @app.post("/files/upload")
+/workspace/mrd69/memory.py:1419:    async def api_upload(file: UploadFile = File(...)):
+/workspace/mrd69/memory.py:1423:    @app.get("/files/{file_id}")
+/workspace/mrd69/memory.py:1424:    def api_get_file(file_id: str):
+/workspace/mrd69/memory.py:1433:    @app.post("/analyze/emotion")
+/workspace/mrd69/memory.py:1434:    def api_emotion(text: str = Form(...)):
+/workspace/mrd69/memory.py:1437:    @app.post("/analyze/ner")
+/workspace/mrd69/memory.py:1438:    def api_ner(text: str = Form(...)): return {"entities": ner(text)}
+/workspace/mrd69/memory.py:1440:    @app.post("/analyze/wsd")
+/workspace/mrd69/memory.py:1441:    def api_wsd(word: str = Form(...), context: str = Form("")): return wsd(word, context)
+/workspace/mrd69/memory.py:1443:    @app.post("/goals/add")
+/workspace/mrd69/memory.py:1444:    def api_goal_add(title: str = Form(...), priority: float = Form(1.0), tags: str = Form("")):
+/workspace/mrd69/memory.py:1448:    @app.get("/goals")
+/workspace/mrd69/memory.py:1449:    def api_goals(): return mem.get_goals()
+/workspace/mrd69/memory.py:1451:    @app.post("/profile/set")
+/workspace/mrd69/memory.py:1452:    def api_profile_set(payload: str = Form(...)):
+/workspace/mrd69/memory.py:1483:    mem=get_memory()
+/workspace/mrd69/crypto_advisor_full.py:40:- memory.get_memory().add_fact(...) — fakty, alerty, raporty
+/workspace/mrd69/crypto_advisor_full.py:971:        from memory import get_memory  # type: ignore
+/workspace/mrd69/crypto_advisor_full.py:973:        return get_memory()
+/workspace/mrd69/autonauka.py:143:        from memory import get_memory
+/workspace/mrd69/autonauka.py:145:        return get_memory()

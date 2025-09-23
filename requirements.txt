@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+requests
+python-dotenv
+prometheus-fastapi-instrumentator
+sqlite-utils
+pandas
+numpy
+notebook

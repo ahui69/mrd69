@@ -1,0 +1,2059 @@
+===== ./.venv/lib64/python3.1 =====
+
+===== ./.venv/lib64/python3.11/site-packages/fastapi/applications.py =====
+from enum import Enum
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Coroutine,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Type,
+    TypeVar,
+    Union,
+)
+
+from fastapi import routing
+from fastapi.datastructures import Default, DefaultPlaceholder
+from fastapi.exception_handlers import (
+    http_exception_handler,
+    request_validation_exception_handler,
+    websocket_request_validation_exception_handler,
+)
+from fastapi.exceptions import RequestValidationError, WebSocketRequestValidationError
+from fastapi.logger import logger
+from fastapi.openapi.docs import (
+    get_redoc_html,
+    get_swagger_ui_html,
+    get_swagger_ui_oauth2_redirect_html,
+)
+from fastapi.openapi.utils import get_openapi
+from fastapi.params import Depends
+from fastapi.types import DecoratedCallable, IncEx
+from fastapi.utils import generate_unique_id
+from starlette.applications import Starlette
+from starlette.datastructures import State
+from starlette.exceptions import HTTPException
+from starlette.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import HTMLResponse, JSONResponse, Response
+from starlette.routing import BaseRoute
+from starlette.types import ASGIApp, Lifespan, Receive, Scope, Send
+from typing_extensions import Annotated, Doc, deprecated
+
+AppType = TypeVar("AppType", bound="FastAPI")
+
+
+class FastAPI(Starlette):
+    """
+    `FastAPI` app class, the main entrypoint to use FastAPI.
+
+    Read more in the
+    [FastAPI docs for First Steps](https://fastapi.tiangolo.com/tutorial/first-steps/).
+
+    ## Example
+
+    ```python
+    from fastapi import FastAPI
+
+    app = FastAPI()
+    ```
+    """
+
+    def __init__(
+        self: AppType,
+        *,
+        debug: Annotated[
+            bool,
+            Doc(
+                """
+                Boolean indicating if debug tracebacks should be returned on server
+                errors.
+
+                Read more in the
+                [Starlette docs for Applications](https://www.starlette.io/applications/#instantiating-the-application).
+                """
+            ),
+        ] = False,
+        routes: Annotated[
+            Optional[List[BaseRoute]],
+            Doc(
+                """
+                **Note**: you probably shouldn't use this parameter, it is inherited
+                from Starlette and supported for compatibility.
+
+                ---
+
+                A list of routes to serve incoming HTTP and WebSocket requests.
+                """
+            ),
+            deprecated(
+                """
+                You normally wouldn't use this parameter with FastAPI, it is inherited
+                from Starlette and supported for compatibility.
+
+                In FastAPI, you normally would use the *path operation methods*,
+                like `app.get()`, `app.post()`, etc.
+                """
+            ),
+        ] = None,
+        title: Annotated[
+            str,
+            Doc(
+                """
+                The title of the API.
+
+                It will be added to the generated OpenAPI (e.g. visible at `/docs`).
+
+                Read more in the
+                [FastAPI docs for Metadata and Docs URLs](https://fastapi.tiangolo.com/tutorial/metadata/#metadata-for-api).
+
+                **Example**
+
+                ```python
+                from fastapi import FastAPI
+
+                app = FastAPI(title="ChimichangApp")
+                ```
+                """
+            ),
+        ] = "FastAPI",
+        summary: Annotated[
+            Optional[str],
+            Doc(
+                """
+                A short summary of the API.
+
+                It will be added to the generated OpenAPI (e.g. visible at `/docs`).
+
+                Read more in the
+                [FastAPI docs for Metadata and Docs URLs](https://fastapi.tiangolo.com/tutorial/metadata/#metadata-for-api).
+
+                **Example**
+
+                ```python
+                from fastapi import FastAPI
+
+                app = FastAPI(summary="Deadpond's favorite app. Nuff said.")
+                ```
+                """
+            ),
+        ] = None,
+        description: Annotated[
+            str,
+            Doc(
+                '''
+                A description of the API. Supports Markdown (using
+                [CommonMark syntax](https://commonmark.org/)).
+
+                It will be added to the generated OpenAPI (e.g. visible at `/docs`).
+
+                Read more in the
+                [FastAPI docs for Metadata and Docs URLs](https://fastapi.tiangolo.com/tutorial/metadata/#metadata-for-api).
+
+                **Example**
+
+                ```python
+                from fastapi import FastAPI
+
+                app = FastAPI(
+                    description="""
+                                ChimichangApp API helps you do awesome stuff. 🚀
+
+                                ## Items
+
+                                You can **read items**.
+
+                                ## Users
+
+                                You will be able to:
+
+                                * **Create users** (_not implemented_).
+                                * **Read users** (_not implemented_).
+
+                                """
+                )
+                ```
+                '''
+            ),
+        ] = "",
+        version: Annotated[
+            str,
+            Doc(
+                """
+                The version of the API.
+
+                **Note** This is the version of your application, not the version of
+                the OpenAPI specification nor the version of FastAPI being used.
+
+                It will be added to the generated OpenAPI (e.g. visible at `/docs`).
+
+                Read more in the
+                [FastAPI docs for Metadata and Docs URLs](https://fastapi.tiangolo.com/tutorial/metadata/#metadata-for-api).
+
+                **Example**
+
+                ```python
+                from fastapi import FastAPI
+
+                app = FastAPI(version="0.0.1")
+
+===== ./.venv/lib64/python3.11/site-packages/fastapi/background.py =====
+from typing import Any, Callable
+
+from starlette.background import BackgroundTasks as StarletteBackgroundTasks
+from typing_extensions import Annotated, Doc, ParamSpec
+
+P = ParamSpec("P")
+
+
+class BackgroundTasks(StarletteBackgroundTasks):
+    """
+    A collection of background tasks that will be called after a response has been
+    sent to the client.
+
+    Read more about it in the
+    [FastAPI docs for Background Tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/).
+
+    ## Example
+
+    ```python
+    from fastapi import BackgroundTasks, FastAPI
+
+    app = FastAPI()
+
+
+    def write_notification(email: str, message=""):
+        with open("log.txt", mode="w") as email_file:
+            content = f"notification for {email}: {message}"
+            email_file.write(content)
+
+
+    @app.post("/send-notification/{email}")
+    async def send_notification(email: str, background_tasks: BackgroundTasks):
+        background_tasks.add_task(write_notification, email, message="some notification")
+        return {"message": "Notification sent in the background"}
+    ```
+    """
+
+    def add_task(
+        self,
+        func: Annotated[
+            Callable[P, Any],
+            Doc(
+                """
+                The function to call after the response is sent.
+
+                It can be a regular `def` function or an `async def` function.
+                """
+            ),
+        ],
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> None:
+        """
+        Add a function to be called in the background after the response is sent.
+
+        Read more about it in the
+        [FastAPI docs for Background Tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/).
+        """
+        return super().add_task(func, *args, **kwargs)
+
+===== ./.venv/lib64/python3.11/site-packages/fastapi/datastructures.py =====
+from typing import (
+    Any,
+    BinaryIO,
+    Callable,
+    Dict,
+    Iterable,
+    Optional,
+    Type,
+    TypeVar,
+    cast,
+)
+
+from fastapi._compat import (
+    PYDANTIC_V2,
+    CoreSchema,
+    GetJsonSchemaHandler,
+    JsonSchemaValue,
+    with_info_plain_validator_function,
+)
+from starlette.datastructures import URL as URL  # noqa: F401
+from starlette.datastructures import Address as Address  # noqa: F401
+from starlette.datastructures import FormData as FormData  # noqa: F401
+from starlette.datastructures import Headers as Headers  # noqa: F401
+from starlette.datastructures import QueryParams as QueryParams  # noqa: F401
+from starlette.datastructures import State as State  # noqa: F401
+from starlette.datastructures import UploadFile as StarletteUploadFile
+from typing_extensions import Annotated, Doc
+
+
+class UploadFile(StarletteUploadFile):
+    """
+    A file uploaded in a request.
+
+    Define it as a *path operation function* (or dependency) parameter.
+
+    If you are using a regular `def` function, you can use the `upload_file.file`
+    attribute to access the raw standard Python file (blocking, not async), useful and
+    needed for non-async code.
+
+    Read more about it in the
+    [FastAPI docs for Request Files](https://fastapi.tiangolo.com/tutorial/request-files/).
+
+    ## Example
+
+    ```python
+    from typing import Annotated
+
+    from fastapi import FastAPI, File, UploadFile
+
+    app = FastAPI()
+
+
+    @app.post("/files/")
+    async def create_file(file: Annotated[bytes, File()]):
+        return {"file_size": len(file)}
+
+
+    @app.post("/uploadfile/")
+    async def create_upload_file(file: UploadFile):
+        return {"filename": file.filename}
+    ```
+    """
+
+    file: Annotated[
+        BinaryIO,
+        Doc("The standard Python file object (non-async)."),
+    ]
+    filename: Annotated[Optional[str], Doc("The original file name.")]
+    size: Annotated[Optional[int], Doc("The size of the file in bytes.")]
+    headers: Annotated[Headers, Doc("The headers of the request.")]
+    content_type: Annotated[
+        Optional[str], Doc("The content type of the request, from the headers.")
+    ]
+
+    async def write(
+        self,
+        data: Annotated[
+            bytes,
+            Doc(
+                """
+                The bytes to write to the file.
+                """
+            ),
+        ],
+    ) -> None:
+        """
+        Write some bytes to the file.
+
+        You normally wouldn't use this from a file you read in a request.
+
+        To be awaitable, compatible with async, this is run in threadpool.
+        """
+        return await super().write(data)
+
+    async def read(
+        self,
+        size: Annotated[
+            int,
+            Doc(
+                """
+                The number of bytes to read from the file.
+                """
+            ),
+        ] = -1,
+    ) -> bytes:
+        """
+        Read some bytes from the file.
+
+        To be awaitable, compatible with async, this is run in threadpool.
+        """
+        return await super().read(size)
+
+    async def seek(
+        self,
+        offset: Annotated[
+            int,
+            Doc(
+                """
+                The position in bytes to seek to in the file.
+                """
+            ),
+        ],
+    ) -> None:
+        """
+        Move to a position in the file.
+
+        Any next read or write will be done from that position.
+
+        To be awaitable, compatible with async, this is run in threadpool.
+        """
+        return await super().seek(offset)
+
+    async def close(self) -> None:
+        """
+        Close the file.
+
+        To be awaitable, compatible with async, this is run in threadpool.
+        """
+        return await super().close()
+
+    @classmethod
+    def __get_validators__(cls: Type["UploadFile"]) -> Iterable[Callable[..., Any]]:
+        yield cls.validate
+
+    @classmethod
+    def validate(cls: Type["UploadFile"], v: Any) -> Any:
+        if not isinstance(v, StarletteUploadFile):
+            raise ValueError(f"Expected UploadFile, received: {type(v)}")
+        return v
+
+    @classmethod
+    def _validate(cls, __input_value: Any, _: Any) -> "UploadFile":
+        if not isinstance(__input_value, StarletteUploadFile):
+            raise ValueError(f"Expected UploadFile, received: {type(__input_value)}")
+        return cast(UploadFile, __input_value)
+
+    if not PYDANTIC_V2:
+
+        @classmethod
+        def __modify_schema__(cls, field_schema: Dict[str, Any]) -> None:
+            field_schema.update({"type": "string", "format": "binary"})
+
+    @classmethod
+    def __get_pydantic_json_schema__(
+        cls, core_schema: CoreSchema, handler: GetJsonSchemaHandler
+    ) -> JsonSchemaValue:
+        return {"type": "string", "format": "binary"}
+
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls, source: Type[Any], handler: Callable[[Any], CoreSchema]
+    ) -> CoreSchema:
+        return with_info_plain_validator_function(cls._validate)
+
+
+class DefaultPlaceholder:
+    """
+    You shouldn't use this class directly.
+
+    It's used internally to recognize when a default value has been overwritten, even
+    if the overridden default value was truthy.
+    """
+
+    def __init__(self, value: Any):
+        self.value = value
+
+    def __bool__(self) -> bool:
+        return bool(self.value)
+
+    def __eq__(self, o: object) -> bool:
+        return isinstance(o, DefaultPlaceholder) and o.value == self.value
+
+
+DefaultType = TypeVar("DefaultType")
+
+
+def Default(value: DefaultType) -> DefaultType:
+    """
+    You shouldn't use this function directly.
+
+
+===== ./.venv/lib64/python3.11/site-packages/fastapi/exceptions.py =====
+from typing import Any, Dict, Optional, Sequence, Type, Union
+
+from pydantic import BaseModel, create_model
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.exceptions import WebSocketException as StarletteWebSocketException
+from typing_extensions import Annotated, Doc
+
+
+class HTTPException(StarletteHTTPException):
+    """
+    An HTTP exception you can raise in your own code to show errors to the client.
+
+    This is for client errors, invalid authentication, invalid data, etc. Not for server
+    errors in your code.
+
+    Read more about it in the
+    [FastAPI docs for Handling Errors](https://fastapi.tiangolo.com/tutorial/handling-errors/).
+
+    ## Example
+
+    ```python
+    from fastapi import FastAPI, HTTPException
+
+    app = FastAPI()
+
+    items = {"foo": "The Foo Wrestlers"}
+
+
+    @app.get("/items/{item_id}")
+    async def read_item(item_id: str):
+        if item_id not in items:
+            raise HTTPException(status_code=404, detail="Item not found")
+        return {"item": items[item_id]}
+    ```
+    """
+
+    def __init__(
+        self,
+        status_code: Annotated[
+            int,
+            Doc(
+                """
+                HTTP status code to send to the client.
+                """
+            ),
+        ],
+        detail: Annotated[
+            Any,
+            Doc(
+                """
+                Any data to be sent to the client in the `detail` key of the JSON
+                response.
+                """
+            ),
+        ] = None,
+        headers: Annotated[
+            Optional[Dict[str, str]],
+            Doc(
+                """
+                Any headers to send to the client in the response.
+                """
+            ),
+        ] = None,
+    ) -> None:
+        super().__init__(status_code=status_code, detail=detail, headers=headers)
+
+
+class WebSocketException(StarletteWebSocketException):
+    """
+    A WebSocket exception you can raise in your own code to show errors to the client.
+
+    This is for client errors, invalid authentication, invalid data, etc. Not for server
+    errors in your code.
+
+    Read more about it in the
+    [FastAPI docs for WebSockets](https://fastapi.tiangolo.com/advanced/websockets/).
+
+    ## Example
+
+    ```python
+    from typing import Annotated
+
+    from fastapi import (
+        Cookie,
+        FastAPI,
+        WebSocket,
+        WebSocketException,
+        status,
+    )
+
+    app = FastAPI()
+
+    @app.websocket("/items/{item_id}/ws")
+    async def websocket_endpoint(
+        *,
+        websocket: WebSocket,
+        session: Annotated[str | None, Cookie()] = None,
+        item_id: str,
+    ):
+        if session is None:
+            raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION)
+        await websocket.accept()
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_text(f"Session cookie is: {session}")
+            await websocket.send_text(f"Message text was: {data}, for item ID: {item_id}")
+    ```
+    """
+
+    def __init__(
+        self,
+        code: Annotated[
+            int,
+            Doc(
+                """
+                A closing code from the
+                [valid codes defined in the specification](https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1).
+                """
+            ),
+        ],
+        reason: Annotated[
+            Union[str, None],
+            Doc(
+                """
+                The reason to close the WebSocket connection.
+
+                It is UTF-8-encoded data. The interpretation of the reason is up to the
+                application, it is not specified by the WebSocket specification.
+
+                It could contain text that could be human-readable or interpretable
+                by the client code, etc.
+                """
+            ),
+        ] = None,
+    ) -> None:
+        super().__init__(code=code, reason=reason)
+
+
+RequestErrorModel: Type[BaseModel] = create_model("Request")
+WebSocketErrorModel: Type[BaseModel] = create_model("WebSocket")
+
+
+class FastAPIError(RuntimeError):
+    """
+    A generic, FastAPI-specific error.
+    """
+
+
+class ValidationException(Exception):
+    def __init__(self, errors: Sequence[Any]) -> None:
+        self._errors = errors
+
+    def errors(self) -> Sequence[Any]:
+        return self._errors
+
+
+class RequestValidationError(ValidationException):
+    def __init__(self, errors: Sequence[Any], *, body: Any = None) -> None:
+        super().__init__(errors)
+        self.body = body
+
+
+class WebSocketRequestValidationError(ValidationException):
+    pass
+
+
+class ResponseValidationError(ValidationException):
+    def __init__(self, errors: Sequence[Any], *, body: Any = None) -> None:
+        super().__init__(errors)
+        self.body = body
+
+    def __str__(self) -> str:
+        message = f"{len(self._errors)} validation errors:\n"
+        for err in self._errors:
+            message += f"  {err}\n"
+        return message
+
+===== ./.venv/lib64/python3.11/site-packages/fastapi/param_functions.py =====
+from typing import Any, Callable, Dict, List, Optional, Sequence, Union
+
+from fastapi import params
+from fastapi._compat import Undefined
+from fastapi.openapi.models import Example
+from typing_extensions import Annotated, Doc, deprecated
+
+_Unset: Any = Undefined
+
+
+def Path(  # noqa: N802
+    default: Annotated[
+        Any,
+        Doc(
+            """
+            Default value if the parameter field is not set.
+
+            This doesn't affect `Path` parameters as the value is always required.
+            The parameter is available only for compatibility.
+            """
+        ),
+    ] = ...,
+    *,
+    default_factory: Annotated[
+        Union[Callable[[], Any], None],
+        Doc(
+            """
+            A callable to generate the default value.
+
+            This doesn't affect `Path` parameters as the value is always required.
+            The parameter is available only for compatibility.
+            """
+        ),
+    ] = _Unset,
+    alias: Annotated[
+        Optional[str],
+        Doc(
+            """
+            An alternative name for the parameter field.
+
+            This will be used to extract the data and for the generated OpenAPI.
+            It is particularly useful when you can't use the name you want because it
+            is a Python reserved keyword or similar.
+            """
+        ),
+    ] = None,
+    alias_priority: Annotated[
+        Union[int, None],
+        Doc(
+            """
+            Priority of the alias. This affects whether an alias generator is used.
+            """
+        ),
+    ] = _Unset,
+    # TODO: update when deprecating Pydantic v1, import these types
+    # validation_alias: str | AliasPath | AliasChoices | None
+    validation_alias: Annotated[
+        Union[str, None],
+        Doc(
+            """
+            'Whitelist' validation step. The parameter field will be the single one
+            allowed by the alias or set of aliases defined.
+            """
+        ),
+    ] = None,
+    serialization_alias: Annotated[
+        Union[str, None],
+        Doc(
+            """
+            'Blacklist' validation step. The vanilla parameter field will be the
+            single one of the alias' or set of aliases' fields and all the other
+            fields will be ignored at serialization time.
+            """
+        ),
+    ] = None,
+    title: Annotated[
+        Optional[str],
+        Doc(
+            """
+            Human-readable title.
+            """
+        ),
+    ] = None,
+    description: Annotated[
+        Optional[str],
+        Doc(
+            """
+            Human-readable description.
+            """
+        ),
+    ] = None,
+    gt: Annotated[
+        Optional[float],
+        Doc(
+            """
+            Greater than. If set, value must be greater than this. Only applicable to
+            numbers.
+            """
+        ),
+    ] = None,
+    ge: Annotated[
+        Optional[float],
+        Doc(
+            """
+            Greater than or equal. If set, value must be greater than or equal to
+            this. Only applicable to numbers.
+            """
+        ),
+    ] = None,
+    lt: Annotated[
+        Optional[float],
+        Doc(
+            """
+            Less than. If set, value must be less than this. Only applicable to numbers.
+            """
+        ),
+    ] = None,
+    le: Annotated[
+        Optional[float],
+        Doc(
+            """
+            Less than or equal. If set, value must be less than or equal to this.
+            Only applicable to numbers.
+            """
+        ),
+    ] = None,
+    min_length: Annotated[
+        Optional[int],
+        Doc(
+            """
+            Minimum length for strings.
+            """
+        ),
+    ] = None,
+    max_length: Annotated[
+        Optional[int],
+        Doc(
+            """
+            Maximum length for strings.
+            """
+        ),
+    ] = None,
+    pattern: Annotated[
+        Optional[str],
+        Doc(
+            """
+            RegEx pattern for strings.
+            """
+        ),
+    ] = None,
+    regex: Annotated[
+        Optional[str],
+        Doc(
+            """
+            RegEx pattern for strings.
+            """
+        ),
+        deprecated(
+            "Deprecated in FastAPI 0.100.0 and Pydantic v2, use `pattern` instead."
+        ),
+    ] = None,
+    discriminator: Annotated[
+        Union[str, None],
+        Doc(
+            """
+            Parameter field name for discriminating the type in a tagged union.
+            """
+        ),
+    ] = None,
+    strict: Annotated[
+        Union[bool, None],
+        Doc(
+            """
+            If `True`, strict validation is applied to the field.
+            """
+        ),
+    ] = _Unset,
+    multiple_of: Annotated[
+        Union[float, None],
+        Doc(
+            """
+            Value must be a multiple of this. Only applicable to numbers.
+            """
+        ),
+    ] = _Unset,
+    allow_inf_nan: Annotated[
+        Union[bool, None],
+        Doc(
+            """
+            Allow `inf`, `-inf`, `nan`. Only applicable to numbers.
+            """
+        ),
+    ] = _Unset,
+    max_digits: Annotated[
+        Union[int, None],
+        Doc(
+            """
+            Maximum number of allow digits for strings.
+            """
+        ),
+
+===== ./.venv/lib64/python3.11/site-packages/fastapi/routing.py =====
+import dataclasses
+import email.message
+import inspect
+import json
+import sys
+from contextlib import AsyncExitStack, asynccontextmanager
+from enum import Enum, IntEnum
+from typing import (
+    Any,
+    AsyncIterator,
+    Callable,
+    Collection,
+    Coroutine,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
+
+from fastapi import params
+from fastapi._compat import (
+    ModelField,
+    Undefined,
+    _get_model_config,
+    _model_dump,
+    _normalize_errors,
+    lenient_issubclass,
+)
+from fastapi.datastructures import Default, DefaultPlaceholder
+from fastapi.dependencies.models import Dependant
+from fastapi.dependencies.utils import (
+    _should_embed_body_fields,
+    get_body_field,
+    get_dependant,
+    get_flat_dependant,
+    get_parameterless_sub_dependant,
+    get_typed_return_annotation,
+    solve_dependencies,
+)
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import (
+    FastAPIError,
+    RequestValidationError,
+    ResponseValidationError,
+    WebSocketRequestValidationError,
+)
+from fastapi.types import DecoratedCallable, IncEx
+from fastapi.utils import (
+    create_cloned_field,
+    create_model_field,
+    generate_unique_id,
+    get_value_or_default,
+    is_body_allowed_for_status_code,
+)
+from pydantic import BaseModel
+from starlette import routing
+from starlette.concurrency import run_in_threadpool
+from starlette.exceptions import HTTPException
+from starlette.requests import Request
+from starlette.responses import JSONResponse, Response
+from starlette.routing import (
+    BaseRoute,
+    Match,
+    compile_path,
+    get_name,
+    request_response,
+    websocket_session,
+)
+from starlette.routing import Mount as Mount  # noqa
+from starlette.types import AppType, ASGIApp, Lifespan, Scope
+from starlette.websockets import WebSocket
+from typing_extensions import Annotated, Doc, deprecated
+
+if sys.version_info >= (3, 13):  # pragma: no cover
+    from inspect import iscoroutinefunction
+else:  # pragma: no cover
+    from asyncio import iscoroutinefunction
+
+
+def _prepare_response_content(
+    res: Any,
+    *,
+    exclude_unset: bool,
+    exclude_defaults: bool = False,
+    exclude_none: bool = False,
+) -> Any:
+    if isinstance(res, BaseModel):
+        read_with_orm_mode = getattr(_get_model_config(res), "read_with_orm_mode", None)
+        if read_with_orm_mode:
+            # Let from_orm extract the data from this model instead of converting
+            # it now to a dict.
+            # Otherwise, there's no way to extract lazy data that requires attribute
+            # access instead of dict iteration, e.g. lazy relationships.
+            return res
+        return _model_dump(
+            res,
+            by_alias=True,
+            exclude_unset=exclude_unset,
+            exclude_defaults=exclude_defaults,
+            exclude_none=exclude_none,
+        )
+    elif isinstance(res, list):
+        return [
+            _prepare_response_content(
+                item,
+                exclude_unset=exclude_unset,
+                exclude_defaults=exclude_defaults,
+                exclude_none=exclude_none,
+            )
+            for item in res
+        ]
+    elif isinstance(res, dict):
+        return {
+            k: _prepare_response_content(
+                v,
+                exclude_unset=exclude_unset,
+                exclude_defaults=exclude_defaults,
+                exclude_none=exclude_none,
+            )
+            for k, v in res.items()
+        }
+    elif dataclasses.is_dataclass(res):
+        assert not isinstance(res, type)
+        return dataclasses.asdict(res)
+    return res
+
+
+def _merge_lifespan_context(
+    original_context: Lifespan[Any], nested_context: Lifespan[Any]
+) -> Lifespan[Any]:
+    @asynccontextmanager
+    async def merged_lifespan(
+        app: AppType,
+    ) -> AsyncIterator[Optional[Mapping[str, Any]]]:
+        async with original_context(app) as maybe_original_state:
+            async with nested_context(app) as maybe_nested_state:
+                if maybe_nested_state is None and maybe_original_state is None:
+                    yield None  # old ASGI compatibility
+                else:
+                    yield {**(maybe_nested_state or {}), **(maybe_original_state or {})}
+
+    return merged_lifespan  # type: ignore[return-value]
+
+
+async def serialize_response(
+    *,
+    field: Optional[ModelField] = None,
+    response_content: Any,
+    include: Optional[IncEx] = None,
+    exclude: Optional[IncEx] = None,
+    by_alias: bool = True,
+    exclude_unset: bool = False,
+    exclude_defaults: bool = False,
+    exclude_none: bool = False,
+    is_coroutine: bool = True,
+) -> Any:
+    if field:
+        errors = []
+        if not hasattr(field, "serialize"):
+            # pydantic v1
+            response_content = _prepare_response_content(
+                response_content,
+                exclude_unset=exclude_unset,
+                exclude_defaults=exclude_defaults,
+                exclude_none=exclude_none,
+            )
+        if is_coroutine:
+            value, errors_ = field.validate(response_content, {}, loc=("response",))
+        else:
+            value, errors_ = await run_in_threadpool(
+                field.validate, response_content, {}, loc=("response",)
+            )
+        if isinstance(errors_, list):
+            errors.extend(errors_)
+        elif errors_:
+            errors.append(errors_)
+        if errors:
+            raise ResponseValidationError(
+                errors=_normalize_errors(errors), body=response_content
+            )
+
+        if hasattr(field, "serialize"):
+            return field.serialize(
+                value,
+                include=include,
+                exclude=exclude,
+                by_alias=by_alias,
+                exclude_unset=exclude_unset,
+                exclude_defaults=exclude_defaults,
+                exclude_none=exclude_none,
+            )
+
+        return jsonable_encoder(
+            value,
+            include=include,
+
+===== ./.venv/lib64/python3.11/site-packages/fastapi/security/api_key.py =====
+from typing import Optional
+
+from fastapi.openapi.models import APIKey, APIKeyIn
+from fastapi.security.base import SecurityBase
+from starlette.exceptions import HTTPException
+from starlette.requests import Request
+from starlette.status import HTTP_403_FORBIDDEN
+from typing_extensions import Annotated, Doc
+
+
+class APIKeyBase(SecurityBase):
+    @staticmethod
+    def check_api_key(api_key: Optional[str], auto_error: bool) -> Optional[str]:
+        if not api_key:
+            if auto_error:
+                raise HTTPException(
+                    status_code=HTTP_403_FORBIDDEN, detail="Not authenticated"
+                )
+            return None
+        return api_key
+
+
+class APIKeyQuery(APIKeyBase):
+    """
+    API key authentication using a query parameter.
+
+    This defines the name of the query parameter that should be provided in the request
+    with the API key and integrates that into the OpenAPI documentation. It extracts
+    the key value sent in the query parameter automatically and provides it as the
+    dependency result. But it doesn't define how to send that API key to the client.
+
+    ## Usage
+
+    Create an instance object and use that object as the dependency in `Depends()`.
+
+    The dependency result will be a string containing the key value.
+
+    ## Example
+
+    ```python
+    from fastapi import Depends, FastAPI
+    from fastapi.security import APIKeyQuery
+
+    app = FastAPI()
+
+    query_scheme = APIKeyQuery(name="api_key")
+
+
+    @app.get("/items/")
+    async def read_items(api_key: str = Depends(query_scheme)):
+        return {"api_key": api_key}
+    ```
+    """
+
+    def __init__(
+        self,
+        *,
+        name: Annotated[
+            str,
+            Doc("Query parameter name."),
+        ],
+        scheme_name: Annotated[
+            Optional[str],
+            Doc(
+                """
+                Security scheme name.
+
+                It will be included in the generated OpenAPI (e.g. visible at `/docs`).
+                """
+            ),
+        ] = None,
+        description: Annotated[
+            Optional[str],
+            Doc(
+                """
+                Security scheme description.
+
+                It will be included in the generated OpenAPI (e.g. visible at `/docs`).
+                """
+            ),
+        ] = None,
+        auto_error: Annotated[
+            bool,
+            Doc(
+                """
+                By default, if the query parameter is not provided, `APIKeyQuery` will
+                automatically cancel the request and send the client an error.
+
+                If `auto_error` is set to `False`, when the query parameter is not
+                available, instead of erroring out, the dependency result will be
+                `None`.
+
+                This is useful when you want to have optional authentication.
+
+                It is also useful when you want to have authentication that can be
+                provided in one of multiple optional ways (for example, in a query
+                parameter or in an HTTP Bearer token).
+                """
+            ),
+        ] = True,
+    ):
+        self.model: APIKey = APIKey(
+            **{"in": APIKeyIn.query},
+            name=name,
+            description=description,
+        )
+        self.scheme_name = scheme_name or self.__class__.__name__
+        self.auto_error = auto_error
+
+    async def __call__(self, request: Request) -> Optional[str]:
+        api_key = request.query_params.get(self.model.name)
+        return self.check_api_key(api_key, self.auto_error)
+
+
+class APIKeyHeader(APIKeyBase):
+    """
+    API key authentication using a header.
+
+    This defines the name of the header that should be provided in the request with
+    the API key and integrates that into the OpenAPI documentation. It extracts
+    the key value sent in the header automatically and provides it as the dependency
+    result. But it doesn't define how to send that key to the client.
+
+    ## Usage
+
+    Create an instance object and use that object as the dependency in `Depends()`.
+
+    The dependency result will be a string containing the key value.
+
+    ## Example
+
+    ```python
+    from fastapi import Depends, FastAPI
+    from fastapi.security import APIKeyHeader
+
+    app = FastAPI()
+
+    header_scheme = APIKeyHeader(name="x-key")
+
+
+    @app.get("/items/")
+    async def read_items(key: str = Depends(header_scheme)):
+        return {"key": key}
+    ```
+    """
+
+    def __init__(
+        self,
+        *,
+        name: Annotated[str, Doc("Header name.")],
+        scheme_name: Annotated[
+            Optional[str],
+            Doc(
+                """
+                Security scheme name.
+
+                It will be included in the generated OpenAPI (e.g. visible at `/docs`).
+                """
+            ),
+        ] = None,
+        description: Annotated[
+            Optional[str],
+            Doc(
+                """
+                Security scheme description.
+
+                It will be included in the generated OpenAPI (e.g. visible at `/docs`).
+                """
+            ),
+        ] = None,
+        auto_error: Annotated[
+            bool,
+            Doc(
+                """
+                By default, if the header is not provided, `APIKeyHeader` will
+                automatically cancel the request and send the client an error.
+
+                If `auto_error` is set to `False`, when the header is not available,
+                instead of erroring out, the dependency result will be `None`.
+
+                This is useful when you want to have optional authentication.
+
+                It is also useful when you want to have authentication that can be
+                provided in one of multiple optional ways (for example, in a header or
+                in an HTTP Bearer token).
+                """
+            ),
+        ] = True,
+    ):
+        self.model: APIKey = APIKey(
+            **{"in": APIKeyIn.header},
+            name=name,
+            description=description,
+        )
+        self.scheme_name = scheme_name or self.__class__.__name__
+        self.auto_error = auto_error
+
+    async def __call__(self, request: Request) -> Optional[str]:
+        api_key = request.headers.get(self.model.name)
+        return self.check_api_key(api_key, self.auto_error)
+
+===== ./.venv/lib64/python3.11/site-packages/fastapi/security/http.py =====
+import binascii
+from base64 import b64decode
+from typing import Optional
+
+from fastapi.exceptions import HTTPException
+from fastapi.openapi.models import HTTPBase as HTTPBaseModel
+from fastapi.openapi.models import HTTPBearer as HTTPBearerModel
+from fastapi.security.base import SecurityBase
+from fastapi.security.utils import get_authorization_scheme_param
+from pydantic import BaseModel
+from starlette.requests import Request
+from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
+from typing_extensions import Annotated, Doc
+
+
+class HTTPBasicCredentials(BaseModel):
+    """
+    The HTTP Basic credentials given as the result of using `HTTPBasic` in a
+    dependency.
+
+    Read more about it in the
+    [FastAPI docs for HTTP Basic Auth](https://fastapi.tiangolo.com/advanced/security/http-basic-auth/).
+    """
+
+    username: Annotated[str, Doc("The HTTP Basic username.")]
+    password: Annotated[str, Doc("The HTTP Basic password.")]
+
+
+class HTTPAuthorizationCredentials(BaseModel):
+    """
+    The HTTP authorization credentials in the result of using `HTTPBearer` or
+    `HTTPDigest` in a dependency.
+
+    The HTTP authorization header value is split by the first space.
+
+    The first part is the `scheme`, the second part is the `credentials`.
+
+    For example, in an HTTP Bearer token scheme, the client will send a header
+    like:
+
+    ```
+    Authorization: Bearer deadbeef12346
+    ```
+
+    In this case:
+
+    * `scheme` will have the value `"Bearer"`
+    * `credentials` will have the value `"deadbeef12346"`
+    """
+
+    scheme: Annotated[
+        str,
+        Doc(
+            """
+            The HTTP authorization scheme extracted from the header value.
+            """
+        ),
+    ]
+    credentials: Annotated[
+        str,
+        Doc(
+            """
+            The HTTP authorization credentials extracted from the header value.
+            """
+        ),
+    ]
+
+
+class HTTPBase(SecurityBase):
+    def __init__(
+        self,
+        *,
+        scheme: str,
+        scheme_name: Optional[str] = None,
+        description: Optional[str] = None,
+        auto_error: bool = True,
+    ):
+        self.model = HTTPBaseModel(scheme=scheme, description=description)
+        self.scheme_name = scheme_name or self.__class__.__name__
+        self.auto_error = auto_error
+
+    async def __call__(
+        self, request: Request
+    ) -> Optional[HTTPAuthorizationCredentials]:
+        authorization = request.headers.get("Authorization")
+        scheme, credentials = get_authorization_scheme_param(authorization)
+        if not (authorization and scheme and credentials):
+            if self.auto_error:
+                raise HTTPException(
+                    status_code=HTTP_403_FORBIDDEN, detail="Not authenticated"
+                )
+            else:
+                return None
+        return HTTPAuthorizationCredentials(scheme=scheme, credentials=credentials)
+
+
+class HTTPBasic(HTTPBase):
+    """
+    HTTP Basic authentication.
+
+    ## Usage
+
+    Create an instance object and use that object as the dependency in `Depends()`.
+
+    The dependency result will be an `HTTPBasicCredentials` object containing the
+    `username` and the `password`.
+
+    Read more about it in the
+    [FastAPI docs for HTTP Basic Auth](https://fastapi.tiangolo.com/advanced/security/http-basic-auth/).
+
+    ## Example
+
+    ```python
+    from typing import Annotated
+
+    from fastapi import Depends, FastAPI
+    from fastapi.security import HTTPBasic, HTTPBasicCredentials
+
+    app = FastAPI()
+
+    security = HTTPBasic()
+
+
+    @app.get("/users/me")
+    def read_current_user(credentials: Annotated[HTTPBasicCredentials, Depends(security)]):
+        return {"username": credentials.username, "password": credentials.password}
+    ```
+    """
+
+    def __init__(
+        self,
+        *,
+        scheme_name: Annotated[
+            Optional[str],
+            Doc(
+                """
+                Security scheme name.
+
+                It will be included in the generated OpenAPI (e.g. visible at `/docs`).
+                """
+            ),
+        ] = None,
+        realm: Annotated[
+            Optional[str],
+            Doc(
+                """
+                HTTP Basic authentication realm.
+                """
+            ),
+        ] = None,
+        description: Annotated[
+            Optional[str],
+            Doc(
+                """
+                Security scheme description.
+
+                It will be included in the generated OpenAPI (e.g. visible at `/docs`).
+                """
+            ),
+        ] = None,
+        auto_error: Annotated[
+            bool,
+            Doc(
+                """
+                By default, if the HTTP Basic authentication is not provided (a
+                header), `HTTPBasic` will automatically cancel the request and send the
+                client an error.
+
+                If `auto_error` is set to `False`, when the HTTP Basic authentication
+                is not available, instead of erroring out, the dependency result will
+                be `None`.
+
+                This is useful when you want to have optional authentication.
+
+                It is also useful when you want to have authentication that can be
+                provided in one of multiple optional ways (for example, in HTTP Basic
+                authentication or in an HTTP Bearer token).
+                """
+            ),
+        ] = True,
+    ):
+        self.model = HTTPBaseModel(scheme="basic", description=description)
+        self.scheme_name = scheme_name or self.__class__.__name__
+        self.realm = realm
+        self.auto_error = auto_error
+
+    async def __call__(  # type: ignore
+        self, request: Request
+    ) -> Optional[HTTPBasicCredentials]:
+        authorization = request.headers.get("Authorization")
+        scheme, param = get_authorization_scheme_param(authorization)
+        if self.realm:
+            unauthorized_headers = {"WWW-Authenticate": f'Basic realm="{self.realm}"'}
+        else:
+            unauthorized_headers = {"WWW-Authenticate": "Basic"}
+        if not authorization or scheme.lower() != "basic":
+            if self.auto_error:
+                raise HTTPException(
+                    status_code=HTTP_401_UNAUTHORIZED,
+                    detail="Not authenticated",
+
+===== ./.venv/lib64/python3.11/site-packages/fastapi/security/oauth2.py =====
+from typing import Any, Dict, List, Optional, Union, cast
+
+from fastapi.exceptions import HTTPException
+from fastapi.openapi.models import OAuth2 as OAuth2Model
+from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
+from fastapi.param_functions import Form
+from fastapi.security.base import SecurityBase
+from fastapi.security.utils import get_authorization_scheme_param
+from starlette.requests import Request
+from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
+
+# TODO: import from typing when deprecating Python 3.9
+from typing_extensions import Annotated, Doc
+
+
+class OAuth2PasswordRequestForm:
+    """
+    This is a dependency class to collect the `username` and `password` as form data
+    for an OAuth2 password flow.
+
+    The OAuth2 specification dictates that for a password flow the data should be
+    collected using form data (instead of JSON) and that it should have the specific
+    fields `username` and `password`.
+
+    All the initialization parameters are extracted from the request.
+
+    Read more about it in the
+    [FastAPI docs for Simple OAuth2 with Password and Bearer](https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/).
+
+    ## Example
+
+    ```python
+    from typing import Annotated
+
+    from fastapi import Depends, FastAPI
+    from fastapi.security import OAuth2PasswordRequestForm
+
+    app = FastAPI()
+
+
+    @app.post("/login")
+    def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+        data = {}
+        data["scopes"] = []
+        for scope in form_data.scopes:
+            data["scopes"].append(scope)
+        if form_data.client_id:
+            data["client_id"] = form_data.client_id
+        if form_data.client_secret:
+            data["client_secret"] = form_data.client_secret
+        return data
+    ```
+
+    Note that for OAuth2 the scope `items:read` is a single scope in an opaque string.
+    You could have custom internal logic to separate it by colon characters (`:`) or
+    similar, and get the two parts `items` and `read`. Many applications do that to
+    group and organize permissions, you could do it as well in your application, just
+    know that that it is application specific, it's not part of the specification.
+    """
+
+    def __init__(
+        self,
+        *,
+        grant_type: Annotated[
+            Union[str, None],
+            Form(pattern="^password$"),
+            Doc(
+                """
+                The OAuth2 spec says it is required and MUST be the fixed string
+                "password". Nevertheless, this dependency class is permissive and
+                allows not passing it. If you want to enforce it, use instead the
+                `OAuth2PasswordRequestFormStrict` dependency.
+                """
+            ),
+        ] = None,
+        username: Annotated[
+            str,
+            Form(),
+            Doc(
+                """
+                `username` string. The OAuth2 spec requires the exact field name
+                `username`.
+                """
+            ),
+        ],
+        password: Annotated[
+            str,
+            Form(json_schema_extra={"format": "password"}),
+            Doc(
+                """
+                `password` string. The OAuth2 spec requires the exact field name
+                `password".
+                """
+            ),
+        ],
+        scope: Annotated[
+            str,
+            Form(),
+            Doc(
+                """
+                A single string with actually several scopes separated by spaces. Each
+                scope is also a string.
+
+                For example, a single string with:
+
+                ```python
+                "items:read items:write users:read profile openid"
+                ````
+
+                would represent the scopes:
+
+                * `items:read`
+                * `items:write`
+                * `users:read`
+                * `profile`
+                * `openid`
+                """
+            ),
+        ] = "",
+        client_id: Annotated[
+            Union[str, None],
+            Form(),
+            Doc(
+                """
+                If there's a `client_id`, it can be sent as part of the form fields.
+                But the OAuth2 specification recommends sending the `client_id` and
+                `client_secret` (if any) using HTTP Basic auth.
+                """
+            ),
+        ] = None,
+        client_secret: Annotated[
+            Union[str, None],
+            Form(json_schema_extra={"format": "password"}),
+            Doc(
+                """
+                If there's a `client_password` (and a `client_id`), they can be sent
+                as part of the form fields. But the OAuth2 specification recommends
+                sending the `client_id` and `client_secret` (if any) using HTTP Basic
+                auth.
+                """
+            ),
+        ] = None,
+    ):
+        self.grant_type = grant_type
+        self.username = username
+        self.password = password
+        self.scopes = scope.split()
+        self.client_id = client_id
+        self.client_secret = client_secret
+
+
+class OAuth2PasswordRequestFormStrict(OAuth2PasswordRequestForm):
+    """
+    This is a dependency class to collect the `username` and `password` as form data
+    for an OAuth2 password flow.
+
+    The OAuth2 specification dictates that for a password flow the data should be
+    collected using form data (instead of JSON) and that it should have the specific
+    fields `username` and `password`.
+
+    All the initialization parameters are extracted from the request.
+
+    The only difference between `OAuth2PasswordRequestFormStrict` and
+    `OAuth2PasswordRequestForm` is that `OAuth2PasswordRequestFormStrict` requires the
+    client to send the form field `grant_type` with the value `"password"`, which
+    is required in the OAuth2 specification (it seems that for no particular reason),
+    while for `OAuth2PasswordRequestForm` `grant_type` is optional.
+
+    Read more about it in the
+    [FastAPI docs for Simple OAuth2 with Password and Bearer](https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/).
+
+    ## Example
+
+    ```python
+    from typing import Annotated
+
+    from fastapi import Depends, FastAPI
+    from fastapi.security import OAuth2PasswordRequestForm
+
+    app = FastAPI()
+
+
+    @app.post("/login")
+    def login(form_data: Annotated[OAuth2PasswordRequestFormStrict, Depends()]):
+        data = {}
+        data["scopes"] = []
+        for scope in form_data.scopes:
+            data["scopes"].append(scope)
+        if form_data.client_id:
+            data["client_id"] = form_data.client_id
+        if form_data.client_secret:
+            data["client_secret"] = form_data.client_secret
+        return data
+    ```
+
+    Note that for OAuth2 the scope `items:read` is a single scope in an opaque string.
+    You could have custom internal logic to separate it by colon characters (`:`) or
+    similar, and get the two parts `items` and `read`. Many applications do that to
+    group and organize permissions, you could do it as well in your application, just
+    know that that it is application specific, it's not part of the specification.
+
+===== ./.venv/lib64/python3.11/site-packages/jupyter_server/gateway/managers.py =====
+"""Kernel gateway managers."""
+
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
+
+import asyncio
+import datetime
+import json
+import os
+from queue import Empty, Queue
+from threading import Thread
+from time import monotonic
+from typing import TYPE_CHECKING, Any, Optional, cast
+
+import websocket
+from jupyter_client.asynchronous.client import AsyncKernelClient
+from jupyter_client.clientabc import KernelClientABC
+from jupyter_client.kernelspec import KernelSpecManager
+from jupyter_client.managerabc import KernelManagerABC
+from jupyter_core.utils import ensure_async
+from tornado import web
+from tornado.escape import json_decode, json_encode, url_escape, utf8
+from traitlets import DottedObjectName, Instance, Type, default
+
+from .._tz import UTC, utcnow
+from ..services.kernels.kernelmanager import (
+    AsyncMappingKernelManager,
+    ServerKernelManager,
+    emit_kernel_action_event,
+)
+from ..services.sessions.sessionmanager import SessionManager
+from ..utils import url_path_join
+from .gateway_client import GatewayClient, gateway_request
+
+if TYPE_CHECKING:
+    from logging import Logger
+
+
+class GatewayMappingKernelManager(AsyncMappingKernelManager):
+    """Kernel manager that supports remote kernels hosted by Jupyter Kernel or Enterprise Gateway."""
+
+    # We'll maintain our own set of kernel ids
+    _kernels: dict[str, GatewayKernelManager] = {}  # type:ignore[assignment]
+
+    @default("kernel_manager_class")
+    def _default_kernel_manager_class(self):
+        return "jupyter_server.gateway.managers.GatewayKernelManager"
+
+    @default("shared_context")
+    def _default_shared_context(self):
+        return False  # no need to share zmq contexts
+
+    def __init__(self, **kwargs):
+        """Initialize a gateway mapping kernel manager."""
+        super().__init__(**kwargs)
+        self.kernels_url = url_path_join(
+            GatewayClient.instance().url or "", GatewayClient.instance().kernels_endpoint or ""
+        )
+
+    def remove_kernel(self, kernel_id):
+        """Complete override since we want to be more tolerant of missing keys"""
+        try:
+            return self._kernels.pop(kernel_id)
+        except KeyError:
+            pass
+
+    async def start_kernel(self, *, kernel_id=None, path=None, **kwargs):
+        """Start a kernel for a session and return its kernel_id.
+
+        Parameters
+        ----------
+        kernel_id : uuid
+            The uuid to associate the new kernel with. If this
+            is not None, this kernel will be persistent whenever it is
+            requested.
+        path : API path
+            The API path (unicode, '/' delimited) for the cwd.
+            Will be transformed to an OS path relative to root_dir.
+        """
+        self.log.info(f"Request start kernel: kernel_id={kernel_id}, path='{path}'")
+
+        if kernel_id is None and path is not None:
+            kwargs["cwd"] = self.cwd_for_path(path)
+
+        km = self.kernel_manager_factory(parent=self, log=self.log)
+        await km.start_kernel(kernel_id=kernel_id, **kwargs)
+        kernel_id = km.kernel_id
+        self._kernels[kernel_id] = km
+        # Initialize culling if not already
+        if not self._initialized_culler:
+            self.initialize_culler()
+
+        return kernel_id
+
+    async def kernel_model(self, kernel_id):
+        """Return a dictionary of kernel information described in the
+        JSON standard model.
+
+        Parameters
+        ----------
+        kernel_id : uuid
+            The uuid of the kernel.
+        """
+        model = None
+        km = self.get_kernel(str(kernel_id))
+        if km:  # type:ignore[truthy-bool]
+            model = km.kernel  # type:ignore[attr-defined]
+        return model
+
+    async def list_kernels(self, **kwargs):
+        """Get a list of running kernels from the Gateway server.
+
+        We'll use this opportunity to refresh the models in each of
+        the kernels we're managing.
+        """
+        self.log.debug(f"Request list kernels: {self.kernels_url}")
+        response = await gateway_request(self.kernels_url, method="GET")
+        kernels = json_decode(response.body)
+        # Refresh our models to those we know about, and filter
+        # the return value with only our kernels.
+        kernel_models = {}
+        for model in kernels:
+            kid = model["id"]
+            if kid in self._kernels:
+                await self._kernels[kid].refresh_model(model)
+                kernel_models[kid] = model
+        # Remove any of our kernels that may have been culled on the gateway server
+        our_kernels = self._kernels.copy()
+        culled_ids = []
+        for kid in our_kernels:
+            if kid not in kernel_models:
+                # The upstream kernel was not reported in the list of kernels.
+                self.log.warning(
+                    f"Kernel {kid} not present in the list of kernels - possibly culled on Gateway server."
+                )
+                try:
+                    # Try to directly refresh the model for this specific kernel in case
+                    # the upstream list of kernels was erroneously incomplete.
+                    #
+                    # That might happen if the case of a proxy that manages multiple
+                    # backends where there could be transient connectivity issues with
+                    # a single backend.
+                    #
+                    # Alternatively, it could happen if there is simply a bug in the
+                    # upstream gateway server.
+                    #
+                    # Either way, including this check improves our reliability in the
+                    # face of such scenarios.
+                    model = await self._kernels[kid].refresh_model()
+                except web.HTTPError:
+                    model = None
+                if model:
+                    kernel_models[kid] = model
+                else:
+                    self.log.warning(
+                        f"Kernel {kid} no longer active - probably culled on Gateway server."
+                    )
+                    self._kernels.pop(kid, None)
+                    culled_ids.append(kid)  # TODO: Figure out what do with these.
+        return list(kernel_models.values())
+
+    async def shutdown_kernel(self, kernel_id, now=False, restart=False):
+        """Shutdown a kernel by its kernel uuid.
+
+        Parameters
+        ==========
+        kernel_id : uuid
+            The id of the kernel to shutdown.
+        now : bool
+            Shutdown the kernel immediately (True) or gracefully (False)
+        restart : bool
+            The purpose of this shutdown is to restart the kernel (True)
+        """
+        km = self.get_kernel(kernel_id)
+        await ensure_async(km.shutdown_kernel(now=now, restart=restart))
+        self.remove_kernel(kernel_id)
+
+    async def restart_kernel(self, kernel_id, now=False, **kwargs):
+        """Restart a kernel by its kernel uuid.
+
+        Parameters
+        ==========
+        kernel_id : uuid
+            The id of the kernel to restart.
+        """
+        km = self.get_kernel(kernel_id)
+        await ensure_async(km.restart_kernel(now=now, **kwargs))
+
+    async def interrupt_kernel(self, kernel_id, **kwargs):
+        """Interrupt a kernel by its kernel uuid.
+
+        Parameters
+        ==========
+        kernel_id : uuid
+            The id of the kernel to interrupt.
+        """
+        km = self.get_kernel(kernel_id)
+        await ensure_async(km.interrupt_kernel())
+
+
+===== ./memory_api.py =====
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+memory_api.py — bezpieczne API dla istniejącego memory.py (bez modyfikacji memory.py)
+Montuj jako router pod /api/memory (lub inną ścieżkę).
+"""
+
+from __future__ import annotations
+from typing import List, Optional, Dict, Any
+from pathlib import Path
+import json
+import time
+
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Query
+from pydantic import BaseModel, Field, validator
+
+# Import twojego modułu pamięci (nie zmieniamy go)
+try:
+    from .memory import get_memory  # type: ignore
+except Exception:
+    # fallback dla wywołania z katalogu roboczego
+    from memory import get_memory  # type: ignore
+
+# ────────────────────────────────────────────────────────────────────────────
+# MODELE (pydantic) — walidacja wejścia/wyjścia
+# ────────────────────────────────────────────────────────────────────────────
+
+class FactIn(BaseModel):
+    text: str = Field(..., min_length=1, max_length=8000)
+    conf: float = Field(0.6, ge=0.0, le=1.0)
+    tags: Optional[List[str]] = None
+    meta: Optional[Dict[str, Any]] = None
+    emb: Optional[List[float]] = None
+
+class FactOut(BaseModel):
+    id: str
+    text: str
+    conf: float
+    tags: List[str] = []
+    ts: float
+    score: float
+    meta: Dict[str, Any] = {}
+
+class RecallIn(BaseModel):
+    q: str = Field(..., min_length=1, max_length=1000)
+    topk: int = Field(6, ge=1, le=100)
+
+class ContextIn(BaseModel):
+    q: str = Field("", max_length=1000)
+    topk: int = Field(12, ge=1, le=60)
+    limit: int = Field(3500, ge=200, le=20000)
+
+class STMAddIn(BaseModel):
+    user: str = ""
+    assistant: str = ""
+
+class GoalIn(BaseModel):
+    title: str = Field(..., min_length=1, max_length=2000)
+    priority: float = Field(1.0, ge=0.0, le=10.0)
+    tags: Optional[List[str]] = None
+
+class GoalPatch(BaseModel):
+    title: Optional[str] = None
+    priority: Optional[float] = Field(None, ge=0.0, le=10.0)
+    tags: Optional[List[str]] = None
+
+class ImportIn(BaseModel):
+    path: str
+    merge: bool = True
+
+class ExportIn(BaseModel):
+    out: str
+
+class PruneIn(BaseModel):
+    target_mb: float = Field(4200.0, ge=100.0, le=100000.0)
+    batch: int = Field(2000, ge=10, le=200000)
+
+class RebuildFTSIn(BaseModel):
+    limit: Optional[int] = Field(None, ge=0, le=2_000_000)
+
+class RebuildEmbIn(BaseModel):
+    batch: int = Field(64, ge=1, le=1024)
+
+# ────────────────────────────────────────────────────────────────────────────
+# ROUTER
+# ────────────────────────────────────────────────────────────────────────────
+
+router = APIRouter(prefix="/api/memory", tags=["memory"])
+
+def mem():
+    # Singleton z Twojego modułu
+    return get_memory()
+
+# ────────────────────────────────────────────────────────────────────────────
+# HEALTH / STATS
+# ────────────────────────────────────────────────────────────────────────────
+
+@router.get("/health")
+def health() -> Dict[str, Any]:
+    try:
+        st = mem().stats()
+        return {"ok": True, "stats": st}
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+
+@router.get("/stats")
+def stats() -> Dict[str, Any]:
+    return mem().stats()
+
+# ────────────────────────────────────────────────────────────────────────────
+# FACTS (CRUD + batch)
+# ────────────────────────────────────────────────────────────────────────────
+
+@router.get("/facts")
+def list_facts(limit: int = Query(100, ge=1, le=5000)) -> List[FactOut]:
+    rows = mem().list_facts(limit=limit)
+    # memory.py już zwraca dicty z polami, mapujemy na model
+    return [FactOut(**r) for r in rows]
+
+@router.post("/facts")
+def add_fact(body: FactIn) -> Dict[str, Any]:
+    try:
+        fid = mem().add_fact(
+            body.text,
+            meta_data=body.meta or {},
+            score=body.conf,
+            emb=body.emb,
+            tags=body.tags or [],
+        )
+        return {"ok": True, "id": fid}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.delete("/facts/{id_or_text}")
+def delete_fact(id_or_text: str) -> Dict[str, Any]:
+    ok = mem().delete_fact(id_or_text)
+    return {"ok": bool(ok)}
+
+@router.post("/facts/bulk")
+def add_fact_bulk(rows: List[FactIn]) -> Dict[str, int]:
+    # memory.add_fact_bulk oczekuje [(text, conf, tags)]
+    tup = [(r.text, r.conf, r.tags or []) for r in rows]
+    return mem().add_fact_bulk(tup)
+
+# ────────────────────────────────────────────────────────────────────────────
+# RECALL / CONTEXT
+# ────────────────────────────────────────────────────────────────────────────
+
+@router.post("/recall")
+def recall(body: RecallIn) -> List[Dict[str, Any]]:
+    # memory.recall zwraca listę (text, score, src)
+    out = []
+    for txt, sc, src in mem().recall(body.q, topk=body.topk):
+        out.append({"text": txt, "score": float(sc), "src": src})
+    return out
+
+@router.post("/context")
+def compose_context(body: ContextIn) -> Dict[str, Any]:
+    ctx = mem().compose_context(body.q, limit_chars=body.limit, topk=body.topk)
+    return {"ok": True, "context": ctx}
+
+# ────────────────────────────────────────────────────────────────────────────
+# STM / EPISODES
+# ────────────────────────────────────────────────────────────────────────────
+
+@router.post("/stm/add")
+def stm_add(body: STMAddIn) -> Dict[str, Any]:
+    mem().stm_add(body.user, body.assistant)
+    return {"ok": True, "count": mem().stm_count()}
+
+@router.get("/stm/tail")
+def stm_tail(n: int = Query(100, ge=1, le=5000)) -> List[Dict[str, Any]]:
+    return mem().stm_tail(n)
+
+@router.post("/stm/flush")
+def stm_flush() -> Dict[str, Any]:
+    return mem().force_flush_stm()
+
+@router.post("/episodes/add")
+def episodes_add(body: STMAddIn) -> Dict[str, Any]:
+    mem().add_episode(body.user, body.assistant)
+    return {"ok": True}
+
+@router.get("/episodes/tail")
+def episodes_tail(n: int = Query(200, ge=1, le=10000)) -> List[Dict[str, Any]]:
+    return mem().episodes_tail(n)
+
+@router.post("/episodes/rotate")
+def episodes_rotate(keep_tail: int = Query(5000, ge=100, le=1_000_000)) -> Dict[str, Any]:
+    return mem().rotate_episodes(keep_tail=keep_tail)
+
+@router.post("/episodes/purge")
+def episodes_purge(older_than_days: int = Query(90, ge=1, le=3650)) -> Dict[str, Any]:
+    return mem().purge_old_episodes(older_than_days=older_than_days)
+
+# ────────────────────────────────────────────────────────────────────────────
+# PROFILE
+# ────────────────────────────────────────────────────────────────────────────
+
+

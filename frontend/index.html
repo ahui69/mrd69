@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="color-scheme" content="dark" />
+  <title>Asystent AI — Mordzix</title>
+  <link rel="stylesheet" href="style.css?v=1758589804?v=1758589768" />
+</head>
+<body>
+<div id="app">
+  <!-- SZUFLADA (archiwum) -->
+  <aside id="drawer" aria-label="Archiwum rozmów">
+    <div class="drawer-header">
+      <div class="brand"><b>Mordzix</b><span> PRO</span><div class="subtitle">Rozmowy</div></div>
+      <button id="closeDrawer" class="btn icon" aria-label="Zamknij">✕</button>
+    </div>
+    <div class="drawer-tools">
+      <input id="historySearch" class="search" type="search" placeholder="Szukaj w rozmowach…" />
+      <div class="row">
+        <button id="newChat" class="btn primary">＋ Nowa</button>
+        <button id="reloadBootstrap" class="btn">⟳ Wiedza</button>
+      </div>
+    </div>
+    <div id="historyList" class="history"></div>
+    <footer class="drawer-footer">
+      <a href="#" id="linkDocs">📚 Dokumentacja</a>
+      <a href="#" id="linkProject">🧠 Pamięć</a>
+      <a href="#" id="linkSettings">⚙️ Ustawienia</a>
+    </footer>
+  </aside>
+
+  <!-- CZAT -->
+  <main id="chat" class="safe">
+    <header class="topbar safe-top">
+      <button id="openDrawer" class="btn icon" aria-label="Otwórz">☰</button>
+      <div class="title">
+        <div class="name">Asystent AI</div>
+        <div class="hint">prawa: Ty · lewa: AI</div>
+      </div>
+      <div id="status" class="status offline" aria-live="polite">Offline</div>
+    </header>
+
+    <section id="messages" class="messages" aria-live="polite"></section>
+
+    <div id="typing" class="typing hidden" aria-hidden="true">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <div class="label">Asystent pisze…</div>
+    </div>
+
+    <footer class="composer safe-bottom">
+      <div class="attachbar">
+        <input type="file" id="fileInput" multiple accept="image/*,video/*,.pdf,.txt,.md,.json,.zip,.png,.jpg,.jpeg,.mp4,.mov" />
+        <button id="btnAttach" class="btn icon" title="Dodaj pliki">📎</button>
+        <div id="attachPreview" class="attach-preview"></div>
+        <button id="btnClearAttach" class="btn subtle small">Wyczyść</button>
+      </div>
+      <div class="input-row">
+        <button id="btnMic" class="btn icon mic" title="Mów (pl-PL)">🎙</button>
+        <input id="textInput" type="text" autocomplete="off" placeholder="Napisz wiadomość…" />
+        <button id="btnSend" class="btn primary">Wyślij</button>
+      </div>
+    </footer>
+  </main>
+</div>
+<script src="app.js?v=1758589804?v=1758589768"></script>
+</body>
+</html>
