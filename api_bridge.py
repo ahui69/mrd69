@@ -1,12 +1,25 @@
 from __future__ import annotations
-import os, json, time, uuid, re
+import os
+import json
+import time
+import uuid
+import re
 from pathlib import Path
-from typing import List, Dict, Any
-from fastapi import FastAPI, APIRouter, UploadFile, File, Form, Request
-from fastapi.responses import JSONResponse, FileResponse
+from typing import List
+from typing import Dict
+from typing import Any
+from fastapi import FastAPI
+from fastapi import APIRouter
+from fastapi import UploadFile
+from fastapi import File
+from fastapi import Form
+from fastapi import Request
+from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
+
 import requests
 
 # ─── stałe ścieżki ─────────────────────────────────────────────────────────
@@ -22,16 +35,19 @@ for d in (THREADS_DIR, UPLOADS, FRONT):
 load_dotenv(ROOT / ".env")
 
 # ─── LLM (DeepInfra/OpenAI-compatible) ─────────────────────────────────────
-LLM_BASE = (os.getenv("LLM_BASE_URL") or "https://api.deepinfra.com/v1/openai").rstrip(
-    "/"
+LLM_BASE = (
+    os.getenv("LLM_BASE_URL") or "https://api.deepinfra.com/v1/openai"
 )
+LLM_BASE = LLM_BASE.rstrip("/")
 LLM_KEY = os.getenv("LLM_API_KEY") or ""
 LLM_MODEL = (os.getenv("LLM_MODEL") or "zai-org/GLM-4.5-Air").strip()
 HTTP_TIMEOUT = int(os.getenv("TIMEOUT_HTTP", "60"))
 
 
 def llm_reply(
-    messages: List[Dict[str, str]], temperature: float = 0.7, max_tokens: int = 800
+    messages: List[Dict[str, str]],
+    temperature: float = 0.7,
+    max_tokens: int = 800,
 ) -> str:
     if not LLM_KEY:
         return "⚠️ Brak LLM_API_KEY — ustaw w .env albo w środowisku."
@@ -82,7 +98,11 @@ def append_msg(tid: str, role: str, content: str) -> None:
     with open(p, "a", encoding="utf-8") as f:
         f.write(
             json.dumps(
-                {"ts": int(time.time() * 1000), "role": role, "content": content},
+                {
+                    "ts": int(time.time() * 1000),
+                    "role": role,
+                    "content": content,
+                },
                 ensure_ascii=False,
             )
             + "\n"
@@ -98,7 +118,7 @@ def read_thread(tid: str) -> List[Dict[str, Any]]:
         for ln in f:
             try:
                 out.append(json.loads(ln))
-            except:
+            except Exception:
                 pass
     return out
 
@@ -106,7 +126,9 @@ def read_thread(tid: str) -> List[Dict[str, Any]]:
 def list_threads() -> List[Dict[str, Any]]:
     items = []
     for p in sorted(
-        THREADS_DIR.glob("*.jsonl"), key=lambda x: x.stat().st_mtime, reverse=True
+            THREADS_DIR.glob("*.jsonl"),
+            key=lambda x: x.stat().st_mtime,
+            reverse=True,
     ):
         try:
             with open(p, "r", encoding="utf-8") as f:
@@ -118,11 +140,11 @@ def list_threads() -> List[Dict[str, Any]]:
                         last_ts = obj.get("ts", last_ts)
                         if not first and obj.get("role") == "user":
                             first = obj.get("content", "")
-                    except:
+                    except Exception:
                         pass
             name = (first or p.stem)[:60]
             items.append({"id": p.stem, "title": name, "updated_at": last_ts})
-        except:
+        except Exception:
             pass
     return items
 
@@ -143,10 +165,15 @@ def load_seed(seed_path: str | None = None) -> int:
                 continue
             try:
                 obj = json.loads(ln)
-                txt = obj.get("text") or obj.get("content") or obj.get("fact") or ""
+                txt = (
+                    obj.get("text")
+                    or obj.get("content")
+                    or obj.get("fact")
+                    or ""
+                )
                 if txt:
                     MEM.append(txt)
-            except:
+            except Exception:
                 pass
     return len(MEM)
 
@@ -199,7 +226,11 @@ async def get_threads():
 async def post_thread():
     tid = create_thread()
     # startowy komunikat systemowy (niewidoczny na liście)
-    append_msg(tid, "system", "Jesteś Mordzix PRO ULTRA. Odpowiadaj po polsku.")
+    append_msg(
+        tid,
+        "system",
+        "Jesteś Mordzix PRO ULTRA. Odpowiadaj po polsku."
+    )
     return {"id": tid}
 
 
@@ -212,7 +243,10 @@ async def get_thread(tid: str):
 async def upload_files(files: List[UploadFile] = File(...)):
     ids = []
     for f in files:
-        name = f"{int(time.time()*1000)}_{re.sub(r'[^a-zA-Z0-9._-]+','_', f.filename)}"
+        name = (
+            f"{int(time.time()*1000)}_"
+            f"{re.sub(r'[^a-zA-Z0-9._-]+','_', f.filename)}"
+        )
         p = UPLOADS / name
         with open(p, "wb") as out:
             out.write(await f.read())
@@ -243,7 +277,9 @@ async def chat(body: Dict[str, Any]):
     msgs = [
         {
             "role": "system",
-            "content": "Jesteś Mordzix PRO ULTRA. Odpowiadaj po polsku, konkretnie.",
+            "content": (
+                "Jesteś Mordzix PRO ULTRA. Odpowiadaj po polsku, konkretnie."
+            ),
         }
     ]
     ctx = memory_context(12)

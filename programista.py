@@ -18,6 +18,7 @@ from __future__ import annotations
 import difflib
 import json
 import os
+import config
 import re
 import shutil
 import subprocess
@@ -63,18 +64,18 @@ def _try_import() -> None:
 _try_import()
 import requests  # noqa: E402
 
-WEB_TIMEOUT = int(os.getenv("WEB_HTTP_TIMEOUT", os.getenv("TIMEOUT_HTTP", "25")))
+WEB_TIMEOUT = config.WEB_HTTP_TIMEOUT
 UA = os.getenv("WEB_USER_AGENT", "Overmind/ProgramistaPRO/2.0")
 S = requests.Session()
 S.headers.update({"User-Agent": UA})
-LLM_BASE = (os.getenv("LLM_BASE_URL") or "https://api.deepinfra.com/v1/openai").rstrip(
+LLM_BASE = (config.LLM_BASE_URL or "https://api.deepinfra.com/v1/openai").rstrip(
     "/"
 )
-LLM_KEY = (os.getenv("LLM_API_KEY") or "").strip()
-LLM_MODEL = os.getenv("LLM_MODEL", "meta-llama/Meta-Llama-3.1-70B-Instruct")
-MINI_BASE = (os.getenv("MINI_LLM_BASE_URL") or LLM_BASE).rstrip("/")
-MINI_KEY = (os.getenv("MINI_LLM_API_KEY") or os.getenv("LLM_API_KEY") or "").strip()
-MINI_MODEL = os.getenv("MINI_LLM_MODEL", "Qwen/Qwen2.5-4B-Instruct")
+LLM_KEY = config.LLM_API_KEY.strip()
+LLM_MODEL = (config.LLM_MODEL or 'meta-llama/Meta-Llama-3.1-70B-Instruct').strip()
+MINI_BASE = (config.MINI_LLM_BASE_URL or LLM_BASE).rstrip("/")
+MINI_KEY = (config.MINI_LLM_API_KEY or config.LLM_API_KEY).strip()
+MINI_MODEL = config.MINI_LLM_MODEL or 'Qwen/Qwen2.5-4B-Instruct'
 
 
 def _chat(

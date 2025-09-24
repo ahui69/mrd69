@@ -15,7 +15,7 @@ ENV (przykład):
   IMG_TIMEOUT=90
 
   # OpenAI
-  OPENAI_KEY=sk-proj-EmKhjmI2SHrDjK75ocjI5OuKI_Uea7qQO-d7t0
+  OPENAI_API_KEY=sk-proj-EmKhjmI2SHrDjK75ocjI5OuKI_Uea7qQO-d7t0
   OPENAI_BASE_URL=https://api.openai.com/v1
 
   # Stability
@@ -44,6 +44,7 @@ import base64
 import json
 import mimetypes
 import os
+import config
 import time
 from pathlib import Path
 from typing import Any
@@ -68,7 +69,7 @@ PROVIDERS = [
 ]
 
 # OpenAI
-OPENAI_KEY = os.getenv("OPENAI_KEY", "")
+OPENAI_API_KEY = config.OPENAI_API_KEY
 OPENAI_BASE = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
 OPENAI_IMG_MODEL = os.getenv("IMG_MODEL", "gpt-image-1")
 
@@ -151,11 +152,11 @@ def _save_meta(fpath: Path, prompt: str, model: str, user: str) -> None:
 # PROVIDER: OpenAI
 # ──────────────────────────────────────────────
 def _openai_generate(prompt: str, size: str, user: str) -> str | None:
-    if not OPENAI_KEY:
+    if not OPENAI_API_KEY:
         return None
     url = f"{OPENAI_BASE}/images/generations"
     payload = {"model": OPENAI_IMG_MODEL, "prompt": prompt, "size": size}
-    headers = {"Authorization": f"Bearer {OPENAI_KEY}"}
+    headers = {"Authorization": f"Bearer {OPENAI_API_KEY}"}
     try:
         r = requests.post(url, json=payload, headers=headers, timeout=TIMEOUT)
         r.raise_for_status()
@@ -174,10 +175,10 @@ def _openai_generate(prompt: str, size: str, user: str) -> str | None:
 
 
 def _openai_edit(image_path: str, prompt: str, user: str) -> str | None:
-    if not OPENAI_KEY:
+    if not OPENAI_API_KEY:
         return None
     url = f"{OPENAI_BASE}/images/edits"
-    headers = {"Authorization": f"Bearer {OPENAI_KEY}"}
+    headers = {"Authorization": f"Bearer {OPENAI_API_KEY}"}
     files = {"image": open(image_path, "rb")}
     data = {"model": OPENAI_IMG_MODEL, "prompt": prompt}
     try:

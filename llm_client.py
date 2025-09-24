@@ -1,24 +1,18 @@
 from __future__ import annotations
 import os, json, requests
+import config
 from typing import List, Dict, Any, Optional
-
-try:
-    from dotenv import load_dotenv
-
-    load_dotenv(dotenv_path=os.path.join("/workspace/mrd69", ".env"))
-except Exception:
-    pass
 
 SECRETS_PATH = os.path.join("/workspace/mrd69", "secrets.json")
 
 
 def _load_from_env() -> dict:
-    base = (os.getenv("LLM_BASE_URL") or "").rstrip("/")
-    key = os.getenv("LLM_API_KEY") or ""
-    model = os.getenv("LLM_MODEL") or ""
-    mini_base = (os.getenv("MINI_LLM_BASE_URL") or base).rstrip("/")
-    mini_key = os.getenv("MINI_LLM_API_KEY") or key
-    mini_model = os.getenv("MINI_LLM_MODEL") or "Qwen/Qwen2.5-4B-Instruct"
+    base = (config.LLM_BASE_URL or "").rstrip("/")
+    key = config.LLM_API_KEY or ""
+    model = config.LLM_MODEL or ""
+    mini_base = (config.MINI_LLM_BASE_URL or base).rstrip("/")
+    mini_key = config.MINI_LLM_API_KEY or key
+    mini_model = config.MINI_LLM_MODEL or 'Qwen/Qwen2.5-4B-Instruct'
     return {
         "base_url": base,
         "api_key": key,

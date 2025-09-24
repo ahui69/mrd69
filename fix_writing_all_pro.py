@@ -2,7 +2,7 @@
 writing_all_pro.py — PRO/ULTRA writer z darmowym RAG i integracjami.
 
 Główne zasady:
-from __future__ import annotations
+
 - Nie modyfikuje: memory.py, psychika.py, autonauka.py, crypto_advisor_full.py.
 - Integracje wykrywane dynamicznie i bezpieczne (try/except + hasattr).
 - MAIN LLM: DeepInfra (OpenAI-compatible). MINI: Gemini flash lub mini OpenAI-compatible.
@@ -18,12 +18,13 @@ Zmienne środowiskowe:
 Ścieżka: /workspace/mrd69
 """
 
-from __future__ import annotations
+
 
 import hashlib
 import html
 import json
 import os
+import config
 import random
 import re
 import time
@@ -46,7 +47,7 @@ load_dotenv()
 # ŚCIEŻKI I I/O
 # ───────────────────────────────────────────────────────────────────────────
 ROOT = Path("/workspace/mrd69")
-OUT_DIR = Path(os.getenv("WRITER_OUT_DIR", str(ROOT / "out" / "writing")))
+OUT_DIR = Path(config.WRITER_OUT_DIR or str(ROOT / "out" / "writing"))
 PIPE_DIR = OUT_DIR / "_pipe"
 DATA_DIR = Path(__file__).resolve().parent / "data"
 for d in (OUT_DIR, PIPE_DIR, DATA_DIR):
@@ -274,8 +275,8 @@ def _mem_add(
 # HTTP (requests + retry) + CACHE
 # ───────────────────────────────────────────────────────────────────────────
 
-WEB_TIMEOUT = int(os.getenv("WEB_HTTP_TIMEOUT", os.getenv("TIMEOUT_HTTP", "20")))
-UA = os.getenv("WEB_USER_AGENT", "MordzixBot/1.0 (writing_all_pro)")
+WEB_TIMEOUT = config.WEB_HTTP_TIMEOUT
+UA = config.WEB_USER_AGENT or "MordzixBot/1.0 (writing_all_pro)"
 
 
 def _http_sess() -> requests.Session:
@@ -391,11 +392,11 @@ def _get_text(url: str) -> str:
 def llm_chat(
     messages: list[dict[str, str]], temperature: float = 0.45, max_tokens: int = 1100
 ) -> str:
-    base = (os.getenv("LLM_BASE_URL") or "https://api.deepinfra.com/v1/openai").rstrip(
+    base = (config.LLM_BASE_URL or "https://api.deepinfra.com/v1/openai").rstrip(
         "/"
     )
-    key = (os.getenv("LLM_API_KEY") or "").strip()
-    model = (os.getenv("LLM_MODEL") or "meta-llama/Meta-Llama-3.1-70B-Instruct").strip()
+    key = config.LLM_API_KEY.strip()
+    model = (config.LLM_MODEL or 'meta-llama/Meta-Llama-3.1-70B-Instruct').strip()
     if not key:
         return "\n".join(
             [m.get("content", "") for m in messages if m.get("role") == "user"]
@@ -437,10 +438,10 @@ def mini_llm_text(prompt: str, max_tokens: int = 256, temperature: float = 0.3) 
 
     # Używamy modelu Qwen 4B
     mini_base = (
-        os.getenv("MINI_LLM_BASE_URL") or os.getenv("LLM_BASE_URL") or ""
+        config.MINI_LLM_BASE_URL or config.LLM_BASE_URL or ""
     ).rstrip("/")
-    mini_key = os.getenv("MINI_LLM_API_KEY") or os.getenv("LLM_API_KEY") or ""
-    mini_model = os.getenv("MINI_LLM_MODEL", "Qwen/Qwen2.5-4B-Instruct")
+    mini_key = (config.MINI_LLM_API_KEY or config.LLM_API_KEY).strip()
+    mini_model = config.MINI_LLM_MODEL or 'Qwen/Qwen2.5-4B-Instruct'
     if mini_base and mini_key:
         try:
             url = mini_base + "/chat/completions"

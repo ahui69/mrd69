@@ -14,8 +14,8 @@ Funkcje kluczowe:
 - Bezpieczeństwo: SSRF guard, FTS safe query, PII maska XOR, clamp tekstów, circuit-breaker fix, logger
 
 WYMAGANIA (opcjonalne):
-- embeddings: ustaw LLM_EMBED_URL + OPENAI_API_KEY/OPENAI_KEY
-- LLM: OPENAI_API_KEY/OPENAI_KEY (używane przez llm_simple.chat jeśli masz swój wrapper)
+- embeddings: ustaw LLM_EMBED_URL + OPENAI_API_KEY
+- LLM: OPENAI_API_KEY (używane przez llm_simple.chat jeśli masz swój wrapper)
 - REST: pip install fastapi uvicorn
 - spaCy (opcjonalnie): pip install spacy pl-core-news-sm  (jeśli chcesz lepszy NER)
 """
@@ -28,6 +28,7 @@ import json
 import math
 import mimetypes
 import os
+import config
 import re
 import shutil
 import sqlite3
@@ -63,9 +64,9 @@ DEBUG = os.getenv("MEM_DEBUG", "0") in ("1", "true", "True")
 def log(*a):
     if DEBUG: print(*a)
 
-ROOT = Path(os.getenv("MEM_ROOT", str(Path(__file__).parent)))
+ROOT = Path(config.MEM_ROOT or str(Path(__file__).parent))
 DATA_DIR = ROOT / "data"
-MEM_NS = (os.getenv("MEM_NS", "default") or "default").strip() or "default"
+MEM_NS = (config.MEM_NS or "default").strip() or "default"
 NS_DIR = DATA_DIR / MEM_NS
 NS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -73,16 +74,16 @@ NS_DIR.mkdir(parents=True, exist_ok=True)
 FILES_DIR = NS_DIR / "files"
 FILES_DIR.mkdir(parents=True, exist_ok=True)
 
-USE_RUNPOD = os.getenv("USE_RUNPOD", "0") in ("1", "true", "True")
-RUNPOD_PATH = os.getenv("RUNPOD_PERSIST_DIR", "/runpod/persist")
+USE_RUNPOD = config.USE_RUNPOD
+RUNPOD_PATH = config.RUNPOD_PERSIST_DIR or "/runpod/persist"
 DB_PATH = (Path(RUNPOD_PATH) / "data" / "ltm.db") if USE_RUNPOD else (DATA_DIR / "memory.db")
 
-LTM_MIN_SCORE = float(os.getenv("LTM_MIN_SCORE", "0.25"))
-MAX_LTM_FACTS = int(os.getenv("MAX_LTM_FACTS", "2000000"))
-RECALL_TOPK_PER_SRC = int(os.getenv("RECALL_TOPK_PER_SRC", "40"))
-STM_MAX_TURNS = int(os.getenv("STM_MAX_TURNS", "400"))
-STM_KEEP_TAIL = int(os.getenv("STM_KEEP_TAIL", "100"))
-HTTP_TIMEOUT = int(os.getenv("LLM_HTTP_TIMEOUT_S", os.getenv("TIMEOUT_HTTP", "60")))
+LTM_MIN_SCORE = config.LTM_MIN_SCORE
+MAX_LTM_FACTS = config.MAX_LTM_FACTS
+RECALL_TOPK_PER_SRC = config.RECALL_TOPK_PER_SRC
+STM_MAX_TURNS = config.STM_MAX_TURNS
+STM_KEEP_TAIL = config.STM_KEEP_TAIL
+HTTP_TIMEOUT = config.LLM_HTTP_TIMEOUT
 _MAX_TEXT = int(os.getenv("MEM_MAX_TEXT", "4000"))
 
 def _clamp_env():
@@ -92,9 +93,9 @@ def _clamp_env():
 _clamp_env()
 
 # Embeddings
-EMBED_URL = (os.getenv("LLM_EMBED_URL") or "").rstrip("/")
-EMBED_MODEL = (os.getenv("LLM_EMBED_MODEL", "text-embedding-3-large") or "").strip()
-EMBED_KEY = (os.getenv("OPENAI_API_KEY") or os.getenv("OPENAI_KEY") or "").strip()
+EMBED_URL = config.LLM_EMBED_URL
+EMBED_MODEL = (config.LLM_EMBED_MODEL or "text-embedding-3-large").strip()
+EMBED_KEY = config.OPENAI_API_KEY.strip()
 
 _RETRY_MAX = int(os.getenv("MEM_RETRY_MAX", "5"))
 _RETRY_INITIAL = float(os.getenv("MEM_RETRY_INITIAL", "0.5"))
@@ -130,7 +131,7 @@ CRYPTO = _Crypto(os.getenv("PSY_ENCRYPT_KEY"))
 def _env_check() -> Dict[str, bool]:
     flags = {
         "EMBED": bool(EMBED_URL and EMBED_KEY),
-        "LLM": bool(os.getenv("OPENAI_API_KEY") or os.getenv("OPENAI_KEY")),
+        "LLM": bool(config.OPENAI_API_KEY),
         "RERANK": bool(os.getenv("LLM_RERANK_URL") or os.getenv("RERANK_URL")),
     }
     log("[MEM]", flags)

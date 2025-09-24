@@ -28,7 +28,7 @@ logging.basicConfig(
 logger = logging.getLogger("runpod_sync")
 
 # Stałe
-SYNC_INTERVAL = int(os.getenv("RUNPOD_SYNC_INTERVAL", "1800"))  # 30 minut domyślnie
+SYNC_INTERVAL = config.RUNPOD_SYNC_INTERVAL  # 30 minutes default
 MAX_BACKUP_RETRIES = 3
 RUNPOD_API_URL = "https://api.runpod.io/v2"
 

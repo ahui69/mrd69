@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Any
 
 import requests
+import config
 
 # ── PATHS / IO ────────────────────────────────────────────────────────────────
 # Konfiguracja ścieżek z ENV
@@ -51,14 +52,14 @@ DEFAULT_TTL = int(os.getenv("TRAVEL_DEFAULT_TTL", "3600"))  # 1h default
 
 # TTL per źródło (sekundy)
 SOURCE_TTL = {
-    "google": int(os.getenv("TRAVEL_GOOGLE_TTL", "3600")),  # 1h
-    "tripadvisor": int(os.getenv("TRAVEL_TA_TTL", "7200")),  # 2h
-    "otm": int(os.getenv("TRAVEL_OTM_TTL", "86400")),  # 24h
-    "wiki": int(os.getenv("TRAVEL_WIKI_TTL", "604800")),  # 7 dni
-    "osm": int(os.getenv("TRAVEL_OSM_TTL", "86400")),  # 24h
-    "weather": int(os.getenv("TRAVEL_WEATHER_TTL", "3600")),  # 1h
-    "transitland": int(os.getenv("TRAVEL_TRANSIT_TTL", "3600")),  # 1h
-    "flights": int(os.getenv("TRAVEL_FLIGHTS_TTL", "1800")),  # 30min
+    "google": config.TRAVEL_GOOGLE_TTL,  # 1h
+    "tripadvisor": config.TRAVEL_TA_TTL,  # 2h
+    "otm": config.TRAVEL_OTM_TTL,  # 24h
+    "wiki": config.TRAVEL_WIKI_TTL,  # 7 dni
+    "osm": config.TRAVEL_OSM_TTL,  # 24h
+    "weather": config.TRAVEL_WEATHER_TTL,  # 1h
+    "transitland": config.TRAVEL_TRANSIT_TTL,  # 1h
+    "flights": config.TRAVEL_FLIGHTS_TTL,  # 30min
 }
 
 
@@ -646,14 +647,14 @@ def export_formats(
 
 
 # ── ENV / HTTP ────────────────────────────────────────────────────────────────
-UA = os.getenv("WEB_USER_AGENT", "Overmind/TravelGuideULTRA/6.0")
-TIMEOUT = int(os.getenv("WEB_HTTP_TIMEOUT", "28"))
-GOOGLE = os.getenv("GOOGLE_MAPS_KEY", "").strip()
-TA_KEY = os.getenv("TRIPADVISOR_KEY", "").strip()
-OTM_KEY = os.getenv("OTM_KEY", "").strip()
-TP_TOKEN = os.getenv("TP_TOKEN", "").strip()
-XW_SEC = os.getenv("XWEATHER_SECRET", "").strip()
-TL_KEY = os.getenv("TRANSITLAND_API_KEY", "").strip()
+UA = config.WEB_USER_AGENT or "Overmind/TravelGuideULTRA/6.0"
+TIMEOUT = config.WEB_HTTP_TIMEOUT
+GOOGLE = config.GOOGLE_MAPS_KEY.strip()
+TA_KEY = config.TRIPADVISOR_KEY.strip()
+OTM_KEY = config.OPENTRIPMAP_KEY.strip()
+TP_TOKEN = config.TRAVEL_PARTNER_API.strip()
+XW_SEC = config.XWEATHER_SECRET.strip()
+TL_KEY = config.TRANSITLAND_API_KEY.strip()
 
 S = requests.Session()
 S.headers.update({"User-Agent": UA})

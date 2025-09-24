@@ -53,6 +53,7 @@ from __future__ import annotations
 import html
 import json
 import os
+import config
 import re
 import threading
 import time
@@ -115,8 +116,8 @@ try:
 except Exception:
     _Retry = None
 
-WEB_TIMEOUT = int(os.getenv("WEB_HTTP_TIMEOUT", os.getenv("HTTP_TIMEOUT", "25")))
-UA = os.getenv("WEB_USER_AGENT", "OvermindCrypto/4.1")
+WEB_TIMEOUT = config.WEB_HTTP_TIMEOUT
+UA = config.WEB_USER_AGENT or "OvermindCrypto/4.1"
 
 
 def _http() -> requests.Session:
@@ -798,11 +799,11 @@ def _llm_chat(
                 return txt
         except Exception as e:
             print(f"Error using common_llm: {e}")
-    base = (os.getenv("LLM_BASE_URL") or "https://api.deepinfra.com/v1/openai").rstrip(
+    base = (config.LLM_BASE_URL or "https://api.deepinfra.com/v1/openai").rstrip(
         "/"
     )
-    key = (os.getenv("LLM_API_KEY") or "").strip()
-    model = (os.getenv("LLM_MODEL") or "Qwen/Qwen2.5-72B-Instruct").strip()
+    key = config.LLM_API_KEY.strip()
+    model = (config.LLM_MODEL or 'Qwen/Qwen2.5-72B-Instruct').strip()
     if not key:
         return "\n".join(
             [m.get("content", "") for m in messages if m.get("role") == "user"]
@@ -838,7 +839,7 @@ def _llm_chat(
 
 
 def portfolio_plan(meta: dict, horizon: str, risk_profile: str) -> dict:
-    base_usd = float(os.getenv("PORTFOLIO_USD", "5000") or "5000")
+    base_usd = float(os.getenv("PORTFOLIO_USD", "5000"))
     meta["risk"]
     pump = meta["pump"]["score"]
     rsi14 = meta["rsi14"]

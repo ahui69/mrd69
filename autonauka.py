@@ -30,6 +30,7 @@ import hashlib
 import html
 import json
 import os
+import config
 import random
 import re
 import time
@@ -53,7 +54,7 @@ from requests.adapters import HTTPAdapter
 SERPAPI_KEY = os.getenv("SERPAPI_KEY", "")
 FIRECRAWL_KEY = os.getenv("FIRECRAWL_KEY", "").strip()
 
-WEB_HTTP_TIMEOUT = int(os.getenv("WEB_HTTP_TIMEOUT", os.getenv("TIMEOUT_HTTP", "45")))
+WEB_HTTP_TIMEOUT = config.WEB_HTTP_TIMEOUT
 AUTO_TOPK = int(os.getenv("AUTO_TOPK", "8"))
 AUTO_FETCH = int(os.getenv("AUTO_FETCH", "4"))
 AUTO_MIN_CHARS = int(os.getenv("AUTO_MIN_CHARS", "800"))
@@ -71,11 +72,11 @@ VOTE_MIN_SOURCES = int(os.getenv("VOTE_MIN_SOURCES", "2"))
 
 # Jedno LLM (domyślnie Qwen 4B na DeepInfra)
 # Uwaga: os.getenv może zwrócić None – zadbajmy, by zawsze operować na str
-_LLM_BASE_RAW = os.getenv("LLM_BASE_URL") or os.getenv("OPENAI_BASE_URL") or ""
+_LLM_BASE_RAW = config.LLM_BASE_URL or ""
 LLM_BASE = _LLM_BASE_RAW.rstrip("/")
-LLM_KEY = (os.getenv("LLM_API_KEY") or "").strip()
-LLM_MODEL = (os.getenv("LLM_MODEL") or "Qwen/Qwen2.5-4B-Instruct").strip()
-LLM_TO = int(os.getenv("LLM_HTTP_TIMEOUT_S", "60"))
+LLM_KEY = config.LLM_API_KEY.strip()
+LLM_MODEL = (config.LLM_MODEL or 'Qwen/Qwen2.5-4B-Instruct').strip()
+LLM_TO = config.LLM_HTTP_TIMEOUT
 
 random.seed(69)
 
