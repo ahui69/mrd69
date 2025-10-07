@@ -1,9 +1,9 @@
 from __future__ import annotations
 import os, json, requests
-import config
+from . import config
 from typing import List, Dict, Any, Optional
 
-SECRETS_PATH = os.path.join("/workspace/mrd69", "secrets.json")
+SECRETS_PATH = os.path.join("/workspace", "secrets.json")
 
 
 def _load_from_env() -> dict:
@@ -60,10 +60,11 @@ MINI_BASE = _picked("mini_base_url") or BASE_URL
 MINI_KEY = _picked("mini_api_key") or API_KEY
 MINI_MODEL = _picked("mini_model") or "Qwen/Qwen2.5-4B-Instruct"
 
-if not (BASE_URL and API_KEY and MODEL):
-    raise RuntimeError(
-        "Brak LLM configu: ustaw LLM_BASE_URL, LLM_API_KEY, LLM_MODEL w .env lub secrets.json"
-    )
+# Jeśli nie ma configu, funkcje zwrócą puste odpowiedzi
+# if not (BASE_URL and API_KEY and MODEL):
+#     raise RuntimeError(
+#         "Brak LLM configu: ustaw LLM_BASE_URL, LLM_API_KEY, LLM_MODEL w .env lub secrets.json"
+#     )
 
 _sess = requests.Session()
 from requests.adapters import HTTPAdapter
@@ -99,6 +100,9 @@ def chat(
     max_tokens: int = 1100,
     stream: bool = False,
 ) -> str:
+    if not (BASE_URL and API_KEY and MODEL):
+        raise RuntimeError("LLM not configured: set LLM_BASE_URL, LLM_API_KEY, LLM_MODEL in .env")
+    
     use_model = (model or MODEL).strip()
     url = BASE_URL.rstrip("/") + "/chat/completions"
     body: Dict[str, Any] = {

@@ -3,8 +3,8 @@ import os
 
 try:
     from dotenv import load_dotenv
-
-    load_dotenv(dotenv_path=os.path.join("/workspace/mrd69", ".env"))
+    # Szukaj .env w workspace root
+    load_dotenv(dotenv_path=os.path.join("/workspace", ".env"))
 except Exception:
     pass
 
@@ -24,7 +24,7 @@ WEB_USER_AGENT = os.getenv("WEB_USER_AGENT", "Mrd69/1.0")
 LLM_HTTP_TIMEOUT = int(os.getenv("LLM_HTTP_TIMEOUT_S", str(WEB_HTTP_TIMEOUT)))
 
 # MEMORY/DB
-MEM_ROOT = os.getenv("MEM_ROOT", "/workspace/mrd69")
+MEM_ROOT = os.getenv("MEM_ROOT", "/workspace")
 MEM_NS = (os.getenv("MEM_NS", "default") or "default").strip()
 LTM_MIN_SCORE = float(os.getenv("LTM_MIN_SCORE", "0.25"))
 MAX_LTM_FACTS = int(os.getenv("MAX_LTM_FACTS", "2000000"))

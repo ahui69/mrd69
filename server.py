@@ -32,24 +32,11 @@ logging.basicConfig(
 # Opcjonalny klient LLM
 # ──────────────────────────────────────────────────────────────────────────────
 try:
-    from src.llm_client import LLMClient  # type: ignore
+    from src import llm_client  # type: ignore
+    LLM_AVAILABLE = True
 except Exception:
-    LLMClient = None  # type: ignore
-
-llm = None
-if LLMClient:
-    try:
-        llm = LLMClient(
-            model=os.getenv(
-                "LLM_MODEL",
-                "meta-llama/Meta-Llama-3.1-70B-Instruct"
-            ),
-            provider=os.getenv("LLM_PROVIDER", "deepinfra"),
-            timeout=int(os.getenv("LLM_TIMEOUT", "30")),
-        )
-    except Exception as e:
-        LOG.warning("LLMClient init failed: %s", e)
-        llm = None
+    llm_client = None  # type: ignore
+    LLM_AVAILABLE = False
 
 runpod_sync = None
 if RunPodSync:
@@ -270,7 +257,7 @@ def api_health():
         mem_ok = False
     return {
         "ok": True,
-        "mode": "echo" if llm is None else "llm",
+        "mode": "echo" if not LLM_AVAILABLE else "llm",
         "memory_router": mem_ok
     }
 
@@ -324,13 +311,17 @@ def api_chat(req: ChatRequest):
             )
 
         # odpowiedź modelu lub echo
-        if llm:
-            reply = llm.chat(
-                messages=current,
-                temperature=0.4,
-                max_tokens=800,
-                stream=False
-            )
+        if LLM_AVAILABLE and llm_client:
+            try:
+                reply = llm_client.chat(
+                    messages=current,
+                    temperature=0.4,
+                    max_tokens=800,
+                    stream=False
+                )
+            except Exception as e:
+                LOG.error("LLM call failed: %s", e)
+                reply = f"(error: {str(e)})"
         else:
             reply = f"(echo) {current[-1]['content'] if current else ''}"
 
