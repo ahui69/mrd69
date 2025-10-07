@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
 try:
-    from fix_writing_all_pro import ListingManager
+    from src.fix_writing_all_pro import ListingManager
 except Exception:  # pragma: no cover - optional dependency
     ListingManager = None  # type: ignore
 

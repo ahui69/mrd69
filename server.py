@@ -18,7 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 try:
-    from runpod_sync import RunPodSync  # type: ignore
+    from src.runpod_sync import RunPodSync  # type: ignore
 except Exception:
     RunPodSync = None  # type: ignore
 
@@ -32,7 +32,7 @@ logging.basicConfig(
 # Opcjonalny klient LLM
 # ──────────────────────────────────────────────────────────────────────────────
 try:
-    from mrd69.llm_client import LLMClient  # type: ignore
+    from src.llm_client import LLMClient  # type: ignore
 except Exception:
     LLMClient = None  # type: ignore
 
@@ -196,7 +196,7 @@ if os.path.isdir(FRONT_DIR):
 
 # Router pamięci (Twój memory_api.py). Jeśli jest – dodaj.
 try:
-    from memory_api import router as memory_router  # type: ignore
+    from src.memory_api import router as memory_router  # type: ignore
     app.include_router(memory_router)
     LOG.info("memory_api router mounted at /api/memory")
 except Exception as e:

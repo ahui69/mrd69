@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
 try:
-    from travelguide import (
+    from src.travelguide import (
         TripSpec,
         attractions,
         geocode,

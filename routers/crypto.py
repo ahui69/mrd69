@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
 try:
-    from crypto_advisor_full import (
+    from src.crypto_advisor_full import (
         Portfolio,
         calculate_token_score,
         load_portfolio,
