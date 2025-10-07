@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Mordzix Assistant</title>
+<link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <header>
+      <h2>Rozmowy</h2>
+      <button id="newChat">+ Nowa</button>
+    </header>
+    <ul id="threads"></ul>
+    <footer>
+      <button id="reloadSeed" title="Przeładuj wiedzę">🔄 seed</button>
+      <a href="/api/health" target="_blank">health</a>
+    </footer>
+  </aside>
+
+  <main id="chat">
+    <header id="topbar">
+      <div class="title">Mordzix PRO ULTRA</div>
+      <div id="mood">🙂</div>
+    </header>
+
+    <section id="messages"></section>
+
+    <div id="composer">
+      <label class="addfile">
+        📎
+        <input type="file" id="fileInput" multiple />
+      </label>
+      <input id="msg" type="text" placeholder="Napisz wiadomość..." autocomplete="off"/>
+      <button id="mic" title="Mów">🎤</button>
+      <button id="send">Wyślij</button>
+    </div>
+
+    <div id="attachPreview"></div>
+    <div id="typing" class="hidden"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+  </main>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>

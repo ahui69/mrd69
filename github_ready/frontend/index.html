@@ -1,0 +1,246 @@
+﻿<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MRD69 Control Center</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar__header">
+        <h1>MRD69</h1>
+        <p>Konsola sterująca</p>
+      </div>
+      <nav class="nav" aria-label="Sekcje aplikacji">
+        <button type="button" class="nav__btn active" data-section="chat">?? Chat</button>
+        <button type="button" class="nav__btn" data-section="listings">?? Listingi</button>
+        <button type="button" class="nav__btn" data-section="travel">?? Travel</button>
+        <button type="button" class="nav__btn" data-section="crypto">?? Crypto</button>
+        <button type="button" class="nav__btn" data-section="memory">?? Pamięć</button>
+      </nav>
+      <div class="sidebar__footer">
+        <div class="status" id="globalStatus">Offline</div>
+        <small>API base: <code>/api</code></small>
+      </div>
+    </aside>
+
+    <main class="main" id="main">
+      <!-- Chat -->
+      <section class="section section--active" id="section-chat" aria-labelledby="chatTitle">
+        <header class="section__header">
+          <div>
+            <h2 id="chatTitle">Asystent</h2>
+            <p class="section__hint">Rozmowy + historia czatów</p>
+          </div>
+          <div class="section__actions">
+            <button type="button" id="chatRefresh" class="btn btn--ghost">?? Odśwież</button>
+            <button type="button" id="chatNew" class="btn btn--primary">? Nowy czat</button>
+          </div>
+        </header>
+
+        <div class="card chat">
+          <aside class="chat__history" aria-label="Historia rozmów">
+            <div class="chat__history-header">
+              <input id="chatHistorySearch" type="search" placeholder="Szukaj…" aria-label="Szukaj w historii" />
+            </div>
+            <div id="chatHistoryList" class="chat__history-list" role="listbox" aria-label="Lista rozmów"></div>
+          </aside>
+
+          <div class="chat__panel">
+            <div id="chatMessages" class="chat__messages" aria-live="polite"></div>
+            <div id="chatTyping" class="chat__typing hidden" aria-hidden="true">Model myśli…</div>
+            <form id="chatForm" class="chat__form" autocomplete="off">
+              <label class="sr-only" for="chatInput">Wiadomość</label>
+              <textarea id="chatInput" rows="3" placeholder="Napisz wiadomość…" required></textarea>
+              <button type="submit" class="btn btn--primary">Wyślij</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- Listings -->
+      <section class="section" id="section-listings" aria-labelledby="listingsTitle">
+        <header class="section__header">
+          <div>
+            <h2 id="listingsTitle">Listing HUB</h2>
+            <p class="section__hint">Obsługa routera /api/listings</p>
+          </div>
+          <div class="section__actions">
+            <button type="button" class="btn btn--ghost" data-action="listings-health">Sprawdź health</button>
+          </div>
+        </header>
+
+        <div class="grid grid--two">
+          <form class="card form" id="listingsCreateForm">
+            <h3>Nowy listing</h3>
+            <div class="form__row">
+              <label>Marka<input name="brand" required /></label>
+              <label>Przedmiot<input name="item" required /></label>
+            </div>
+            <div class="form__row">
+              <label>Stan
+                <select name="cond">
+                  <option>Nowy</option>
+                  <option>Bardzo dobry</option>
+                  <option>Dobry</option>
+                  <option>Vintage</option>
+                </select>
+              </label>
+              <label>Rozmiar<input name="size" required /></label>
+            </div>
+            <div class="form__row">
+              <label>Kolor<input name="color" /></label>
+              <label>Cena bazowa<input type="number" step="0.01" name="base_price" /></label>
+            </div>
+            <label>Notatki<textarea name="notes" rows="3"></textarea></label>
+            <div class="form__row">
+              <label>Ton
+                <select name="copy_tone">
+                  <option value="balanced">balanced</option>
+                  <option value="sales">sales</option>
+                  <option value="brand">brand</option>
+                </select>
+              </label>
+              <label>Poziom profanum<input type="number" step="0.1" min="0" max="1" name="profanity_level" value="0" /></label>
+            </div>
+            <button type="submit" class="btn btn--primary">Generuj listing</button>
+          </form>
+
+          <form class="card form" id="listingsSearchForm">
+            <h3>Wyszukaj listingi</h3>
+            <label>Fraza pełnotekstowa<input name="text" placeholder="sukienka satynowa" /></label>
+            <label>Marka<input name="brand" placeholder="Zara" /></label>
+            <label>Rozmiar<input name="size" placeholder="M" /></label>
+            <label>Limit<input type="number" name="limit" value="10" min="1" max="200" /></label>\n            <label>Slug (opcjonalnie)<input name="slug" placeholder="marka-item-rozmiar" /></label>
+            <button type="submit" class="btn btn--primary">Szukaj</button>
+            <button type="button" class="btn btn--ghost" data-action="listings-metrics">Pokaż metryki</button>
+            <button type="button" class="btn btn--ghost" data-action="listings-prices">Dynamiczne ceny</button>
+          </form>
+        </div>
+        <article class="card output" id="listingsOutput" aria-live="polite"></article>
+      </section>
+
+      <!-- Travel -->
+      <section class="section" id="section-travel" aria-labelledby="travelTitle">
+        <header class="section__header">
+          <div>
+            <h2 id="travelTitle">Travel Planner</h2>
+            <p class="section__hint">Router /api/travel</p>
+          </div>
+          <div class="section__actions">
+            <button type="button" class="btn btn--ghost" data-action="travel-restaurants">Restauracje</button>
+            <button type="button" class="btn btn--ghost" data-action="travel-hotels">Hotele</button>
+            <button type="button" class="btn btn--ghost" data-action="travel-attractions">Atrakcje</button>
+          </div>
+        </header>
+
+        <form class="card form" id="travelPlanForm">
+          <h3>Plan podróży</h3>
+          <div class="form__row">
+            <label>Miejsce<input name="place" placeholder="Barcelona" required /></label>
+            <label>Dni<input type="number" name="days" min="1" max="30" value="4" required /></label>
+            <label>Styl
+              <select name="style">
+                <option value="auto">auto</option>
+                <option value="friendly">friendly</option>
+                <option value="elegant">elegant</option>
+                <option value="energetic">energetic</option>
+                <option value="scholarly">scholarly</option>
+                <option value="casual">casual</option>
+                <option value="professional">professional</option>
+              </select>
+            </label>
+          </div>
+          <div class="form__row">
+            <label><input type="checkbox" name="food" checked /> Dodaj jedzenie</label>
+            <label><input type="checkbox" name="hotels" checked /> Dodaj hotele</label>
+            <label>Użytkownik<input name="user" value="default" /></label>
+          </div>
+          <div class="form__row">
+            <label>Lot z (IATA/miasto)<input name="origin" placeholder="WAW" /></label>
+            <label>Lot do<input name="destination" placeholder="BCN" /></label>
+            <label>Miesiąc (YYYY-MM)<input name="month" placeholder="2025-10" /></label>
+          </div>
+          <button type="submit" class="btn btn--primary">Buduj plan</button>
+          <div class="form__row form__row--actions">
+            <button type="button" class="btn btn--ghost" data-action="travel-flights">Najtańsze loty</button>
+            <button type="button" class="btn btn--ghost" data-action="travel-transit">Transport publiczny</button>
+            <button type="button" class="btn btn--ghost" data-action="travel-map">Mapa</button>
+          </div>
+        </form>
+        <article class="card output" id="travelOutput" aria-live="polite"></article>
+      </section>
+
+      <!-- Crypto -->
+      <section class="section" id="section-crypto" aria-labelledby="cryptoTitle">
+        <header class="section__header">
+          <div>
+            <h2 id="cryptoTitle">Crypto Advisor</h2>
+            <p class="section__hint">Analizy z /api/crypto</p>
+          </div>
+          <div class="section__actions">
+            <button type="button" class="btn btn--ghost" data-action="crypto-health">Health</button>
+          </div>
+        </header>
+
+        <div class="grid grid--two">
+                    <form class="card form" id="cryptoTokenForm">
+            <h3>Token</h3>
+            <label>ID tokena<input name="token" placeholder="bitcoin" required /></label>
+            <label>Waluta bazowa<input name="vs" value="usd" /></label>
+            <label>Limit screenera<input type="number" name="limit" value="25" min="1" max="200" /></label>
+            <div class="form__row form__row--actions">
+              <button type="submit" class="btn btn--primary">Skan</button>
+              <button type="button" class="btn btn--ghost" data-action="crypto-report">Raport</button>
+              <button type="button" class="btn btn--ghost" data-action="crypto-score">Score</button>
+              <button type="button" class="btn btn--ghost" data-action="crypto-backtest">Backtest</button>
+            </div>
+          </form>
+
+          <form class="card form" id="cryptoPortfolioForm">
+            <h3>Portfel</h3>
+            <label>ID użytkownika<input name="user" value="demo" required /></label>
+            <label>Adres ETH (opcjonalnie)<input name="address" placeholder="0x..." /></label>
+            <label>Limit screenera<input type="number" name="limit" value="25" min="1" max="200" /></label>\n            <div class="form__row form__row--actions">
+              <button type="button" class="btn btn--ghost" data-action="crypto-screener">Top screener</button>
+              <button type="button" class="btn btn--ghost" data-action="crypto-add">Dodaj adres</button>
+              <button type="button" class="btn btn--ghost" data-action="crypto-scan">Skan portfela</button>
+              <button type="button" class="btn btn--ghost" data-action="crypto-portfolio-report">Raport portfela</button>
+            </div>
+          </form>
+        </div>
+        <article class="card output" id="cryptoOutput" aria-live="polite"></article>
+      </section>
+
+      <!-- Memory -->
+      <section class="section" id="section-memory" aria-labelledby="memoryTitle">
+        <header class="section__header">
+          <div>
+            <h2 id="memoryTitle">Pamięć /api/memory</h2>
+            <p class="section__hint">Statystyki i kontekst przypominania</p>
+          </div>
+        </header>
+
+        <form class="card form" id="memoryForm">
+          <label>Limit screenera<input type="number" name="limit" value="25" min="1" max="200" /></label>\n            <div class="form__row form__row--actions">
+            <button type="button" class="btn btn--primary" data-action="memory-health">Health</button>
+            <button type="button" class="btn btn--ghost" data-action="memory-stats">Statystyki</button>
+          </div>
+          <label>Zapytanie recall<input name="query" placeholder="ostatnie fakty o podróżach" /></label>
+          <button type="button" class="btn btn--ghost" data-action="memory-recall">Recall</button>
+        </div>
+        <article class="card output" id="memoryOutput" aria-live="polite"></article>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
+
