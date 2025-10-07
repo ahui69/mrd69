@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MRD69 - Asystent AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            height: calc(100vh - 20px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .header-left .subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .clock-widget {
+            text-align: right;
+        }
+        
+        .clock {
+            font-size: 32px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+        
+        .date {
+            font-size: 13px;
+            opacity: 0.95;
+            margin-top: 6px;
+        }
+        
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 16px;
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.user { justify-content: flex-end; }
+        
+        .message-bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .message.assistant .message-bubble {
+            background: white;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .message.system .message-bubble {
+            background: #fff3cd;
+            color: #856404;
+            max-width: 85%;
+            font-size: 14px;
+        }
+        
+        .sources {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        
+        .sources a {
+            color: #667eea;
+            text-decoration: none;
+            display: block;
+            margin: 3px 0;
+        }
+        
+        .sources a:hover { text-decoration: underline; }
+        
+        .input-section {
+            padding: 16px 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            border-radius: 0 0 16px 16px;
+        }
+        
+        .options {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+        
+        .options label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .btn-clear {
+            margin-left: auto;
+            padding: 6px 12px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        .btn-clear:hover { background: #c82333; }
+        
+        .input-box {
+            display: flex;
+            gap: 10px;
+        }
+        
+        textarea {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+        }
+        
+        textarea:focus { border-color: #667eea; }
+        
+        .btn-send {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-send:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading { text-align: center; padding: 20px; color: #667eea; }
+        .spinner {
+            display: inline-block;
+            width: 20px; height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>🤖 MRD69 Asystent AI</h1>
+                <div class="subtitle">Twój inteligentny pomocnik</div>
+            </div>
+            <div class="clock-widget">
+                <div class="clock" id="clock">00:00:00</div>
+                <div class="date" id="date">Ładowanie...</div>
+            </div>
+        </div>
+        
+        <div class="chat-area" id="chatArea">
+            <div class="message system">
+                <div class="message-bubble">
+                    👋 Cześć! Jestem Twoim asystentem AI. Zadaj pytanie lub zaznacz "Web" dla wyszukiwania w internecie!
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-section">
+            <div class="options">
+                <label>
+                    <input type="checkbox" id="useWeb">
+                    🌐 Web (szukaj w internecie)
+                </label>
+                <button class="btn-clear" onclick="clearChat()">🗑️ Wyczyść</button>
+            </div>
+            
+            <div class="input-box">
+                <textarea 
+                    id="msgInput" 
+                    rows="2" 
+                    placeholder="Wpisz wiadomość..."
+                    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"
+                ></textarea>
+                <button class="btn-send" id="sendBtn" onclick="sendMsg()">Wyślij</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        const chatArea = document.getElementById('chatArea');
+        const msgInput = document.getElementById('msgInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const useWebCb = document.getElementById('useWeb');
+        
+        // ═══════════════════════════════════════════════════════
+        // ZEGAREK I DATA - AKTUALIZUJE CO SEKUNDĘ!
+        // ═══════════════════════════════════════════════════════
+        function updateClock() {
+            const now = new Date();
+            
+            // Czas HH:MM:SS
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+            
+            // Data po polsku
+            const dni = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
+            const miesiace = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca',
+                             'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
+            
+            const dzien = dni[now.getDay()];
+            const data = now.getDate();
+            const miesiac = miesiace[now.getMonth()];
+            const rok = now.getFullYear();
+            
+            document.getElementById('date').textContent = `${dzien}, ${data} ${miesiac} ${rok}`;
+        }
+        
+        // Start zegara
+        updateClock();
+        setInterval(updateClock, 1000);
+        
+        // ═══════════════════════════════════════════════════════
+        // FUNKCJE CZATU
+        // ═══════════════════════════════════════════════════════
+        
+        function addMsg(role, content, sources = null) {
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.textContent = content;
+            
+            div.appendChild(bubble);
+            
+            // Dodaj źródła jeśli są
+            if (sources && sources.length > 0) {
+                const srcDiv = document.createElement('div');
+                srcDiv.className = 'sources';
+                srcDiv.innerHTML = '<strong>📚 Źródła:</strong><br>' +
+                    sources.map(s => `<a href="${s.url}" target="_blank">• ${s.title}</a>`).join('');
+                div.appendChild(srcDiv);
+            }
+            
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+        
+        async function sendMsg() {
+            const text = msgInput.value.trim();
+            if (!text) return;
+            
+            const useWeb = useWebCb.checked;
+            
+            // Pokaż wiadomość usera
+            addMsg('user', text);
+            msgInput.value = '';
+            
+            // Loading
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<div class="spinner"></div>';
+            
+            try {
+                // Wywołaj API
+                const endpoint = useWeb ? '/api/auto/learn' : '/api/chat/complete';
+                const body = useWeb ? 
+                    JSON.stringify({q: text}) :
+                    JSON.stringify({text: text, user: 'default'});
+                
+                const resp = await fetch(API_BASE + endpoint, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: body
+                });
+                
+                const data = await resp.json();
+                
+                if (data.ok) {
+                    // Odpowiedź
+                    const answer = data.answer || data.draft || data.context || 'Brak odpowiedzi';
+                    const sources = data.sources || [];
+                    
+                    addMsg('assistant', answer, sources.length > 0 ? sources : null);
+                } else {
+                    addMsg('system', 'Błąd: ' + (data.error || 'Nieznany błąd'));
+                }
+            } catch (err) {
+                addMsg('system', 'Błąd połączenia: ' + err.message);
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Wyślij';
+                msgInput.focus();
+            }
+        }
+        
+        async function clearChat() {
+            if (!confirm('Wyczyścić czat?')) return;
+            chatArea.innerHTML = '<div class="message system"><div class="message-bubble">Czat wyczyszczony!</div></div>';
+        }
+        
+        // Focus na input
+        msgInput.focus();
+    </script>
+</body>
+</html>
