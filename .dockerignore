@@ -1,0 +1,51 @@
+# Co NIE kopiować do Docker image
+# (żeby obraz był mniejszy i szybszy)
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Środowiska wirtualne
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Git
+.git/
+.gitignore
+
+# Logi i dane (te będą w volumes)
+*.log
+*.pid
+data/
+logs/
+uploads/
+history/
+
+# Testy (nie potrzebne w produkcji)
+test_*.py
+tests/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Docs (nie potrzebne w kontenerze)
+*.md
+docs/
+
+# Tymczasowe
+*.tmp
+*.bak
+server_run.log

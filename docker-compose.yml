@@ -1,0 +1,53 @@
+# ════════════════════════════════════════════════════════
+# DOCKER COMPOSE - jeszcze prostsze niż Dockerfile
+# 
+# To jest jak "installer.exe" - jeden plik, jedno kliknięcie
+# ════════════════════════════════════════════════════════
+
+version: '3.8'
+
+services:
+  # ── SERWIS 1: Twoja aplikacja ──
+  app:
+    # Zbuduj z Dockerfile
+    build: .
+    
+    # Nazwa kontenera
+    container_name: mrd69-api
+    
+    # Port: localhost:8000 → kontener:8000
+    ports:
+      - "8000:8000"
+    
+    # Woluminy (mapowanie folderów)
+    # Twoje pliki na komputerze ↔ pliki w kontenerze
+    volumes:
+      - ./data:/app/data           # Baza danych
+      - ./logs:/app/logs           # Logi
+      - ./.env:/app/.env           # Klucze API
+    
+    # Zmienne środowiskowe
+    environment:
+      - PYTHONUNBUFFERED=1
+    
+    # Restart automatyczny jak kontener się wywali
+    restart: unless-stopped
+
+# ════════════════════════════════════════════════════════
+# JAK UŻYĆ:
+#
+# Zbuduj i uruchom (JEDNO polecenie!):
+#   docker-compose up -d
+#
+# Zatrzymaj:
+#   docker-compose down
+#
+# Zobacz logi:
+#   docker-compose logs -f
+#
+# Restart:
+#   docker-compose restart
+#
+# Rebuild po zmianach w kodzie:
+#   docker-compose up -d --build
+# ════════════════════════════════════════════════════════
