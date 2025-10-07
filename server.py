@@ -182,12 +182,13 @@ if os.path.isdir(FRONT_DIR):
     )
 
 # Router pamięci (Twój memory_api.py). Jeśli jest – dodaj.
-try:
-    from src.memory_api import router as memory_router  # type: ignore
-    app.include_router(memory_router)
-    LOG.info("memory_api router mounted at /api/memory")
-except Exception as e:
-    LOG.warning("memory_api not mounted: %s", e)
+# WYŁĄCZONE - wymaga dodatkowej konfiguracji
+# try:
+#     from src.memory_api import router as memory_router  # type: ignore
+#     app.include_router(memory_router)
+#     LOG.info("memory_api router mounted at /api/memory")
+# except Exception as e:
+#     LOG.warning("memory_api not mounted: %s", e)
 
 try:
     from routers.writing import router as writing_router  # type: ignore
