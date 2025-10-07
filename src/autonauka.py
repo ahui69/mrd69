@@ -30,7 +30,7 @@ import hashlib
 import html
 import json
 import os
-import config
+from . import config
 import random
 import re
 import time

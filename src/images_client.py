@@ -44,7 +44,7 @@ import base64
 import json
 import mimetypes
 import os
-import config
+from . import config
 import time
 from pathlib import Path
 from typing import Any

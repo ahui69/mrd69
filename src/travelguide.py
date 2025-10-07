@@ -32,7 +32,7 @@ from pathlib import Path
 from typing import Any
 
 import requests
-import config
+from . import config
 
 # ── PATHS / IO ────────────────────────────────────────────────────────────────
 # Konfiguracja ścieżek z ENV

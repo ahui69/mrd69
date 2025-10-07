@@ -1,54 +1,122 @@
-# MRD69 - Multi-Purpose AI Chat API
+# 🚀 MRD69 - Multi-Purpose AI Chat API
 
-Aplikacja FastAPI z interfejsem czatu, integracją LLM i wieloma specjalistycznymi routerami.
+**Status: ✅ DZIAŁA!** (Serwer uruchomiony, LLM aktywny)
+
+Aplikacja FastAPI z chat AI, integracją LLM (po polsku!) i wieloma specjalistycznymi routerami.
+
+---
+
+## ⚡ SZYBKI START (1 minuta)
+
+```bash
+# 1. Zainstaluj zależności (jeśli nie masz)
+pip install -r requirements.txt
+
+# 2. Uruchom serwer
+./run.sh
+# LUB: python3 -m uvicorn server:app --reload
+
+# 3. Otwórz w przeglądarce
+http://localhost:8000/docs      # 📖 Dokumentacja API
+http://localhost:8000/app        # 🎨 Frontend
+http://localhost:8000/api/health # 💚 Health check
+```
+
+**TO WSZYSTKO!** Serwer już działa 🎉
+
+---
+
+## 📚 DOKUMENTACJA
+
+- **[START.md](START.md)** - Jak uruchomić i podstawy
+- **[STATUS.md](STATUS.md)** - Co działa, co naprawiono
+- **[CO_DALEJ.md](CO_DALEJ.md)** - Ścieżka nauki (od zera do bohatera)
+- **[TEST.md](TEST.md)** - Szybkie testy wszystkich funkcji
+
+---
+
+## 🎯 CO DZIAŁA - TWOJE API
+
+### ✅ **CHAT Z AI** (po polsku!)
+```bash
+curl -X POST http://localhost:8000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"newMessage": {"role":"user", "content":"Opowiedz dowcip"}}'
+```
+
+### ✅ **CRYPTO API**
+```bash
+curl "http://localhost:8000/api/crypto/screener?limit=5"
+curl "http://localhost:8000/api/crypto/token/bitcoin"
+```
+
+### ✅ **TRAVEL API**  
+```bash
+curl "http://localhost:8000/api/travel/restaurants?place=Kraków&max_results=5"
+curl "http://localhost:8000/api/travel/hotels?place=Warszawa"
+```
+
+### ✅ **LISTINGS/WRITING API**
+```bash
+curl "http://localhost:8000/api/listings/search?brand=Nike&limit=10"
+```
+
+---
 
 ## 🚀 Funkcje
 
-- **Chat API** - Czat z historią rozmów zapisaną w SQLite
-- **Memory System** - System pamięci z API
-- **Specialized Routers:**
-  - 🔐 Crypto Advisor - Doradztwo kryptowalutowe
-  - ✈️ Travel Guide - Przewodnik podróży
-  - ✍️ Writing Assistant - Asystent pisania
-- **Frontend** - Prosty interfejs webowy
-- **File Upload** - Obsługa przesyłania plików
-- **RunPod Integration** - Opcjonalna synchronizacja z RunPod
+- **💬 Chat API** - LLM chat z historią (SQLite)
+- **🔐 Crypto Advisor** - Screener, portfolio, backtesting
+- **✈️ Travel Guide** - Hotels, restauracje, atrakcje, loty
+- **✍️ Writing Assistant** - Generowanie ogłoszeń
+- **🧠 Memory System** (1500 linii!) - RAG, embeddings, emocje
+- **📁 File Upload** - OCR, konwersje PDF/DOCX
+- **🎨 Frontend** - Prosty interfejs webowy
 
-## 📋 Wymagania
+---
 
+## 🛠️ Instalacja i Konfiguracja
+
+### Wymagania:
 - Python 3.8+
-- FastAPI
-- SQLite
+- FastAPI, uvicorn, SQLite (wszystko w `requirements.txt`)
 
-## 🛠️ Instalacja
-
-1. Zainstaluj zależności:
+### Setup:
 ```bash
+# 1. Klonuj/pobierz repo (już masz!)
+cd /workspace
+
+# 2. Zainstaluj
 pip install -r requirements.txt
+
+# 3. (Opcjonalnie) Edytuj .env
+# Klucze LLM już są - działa!
+# Jeśli chcesz dodać inne API:
+nano .env
 ```
 
-2. Skopiuj plik konfiguracyjny:
-```bash
-cp .env.example .env
-```
-
-3. Edytuj `.env` i uzupełnij swoje klucze API (opcjonalne)
+---
 
 ## 🎯 Uruchomienie
 
-### Szybki start:
+### Opcja A - Prosty sposób:
 ```bash
-./start.sh
+./run.sh
 ```
 
-### Lub ręcznie:
+### Opcja B - Ręcznie:
 ```bash
-uvicorn server:app --host 0.0.0.0 --port 8000 --reload
+python3 -m uvicorn server:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### Uruchomienie wszystkich serwisów:
+### Opcja C - W tle:
 ```bash
-./run_all.sh
+nohup python3 -m uvicorn server:app --port 8000 > server.log 2>&1 &
+```
+
+### Zatrzymanie:
+```bash
+./stop.sh
 ```
 
 ## 📁 Struktura projektu

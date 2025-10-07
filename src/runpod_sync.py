@@ -15,7 +15,7 @@ from typing import Any
 
 import requests
 
-import config
+from . import config
 from memory import _vacuum_if_needed
 
 # Konfiguracja logowania

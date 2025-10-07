@@ -53,7 +53,7 @@ from __future__ import annotations
 import html
 import json
 import os
-import config
+from . import config
 import re
 import threading
 import time

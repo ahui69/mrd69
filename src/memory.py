@@ -28,7 +28,7 @@ import json
 import math
 import mimetypes
 import os
-import config
+from . import config
 import re
 import shutil
 import sqlite3
