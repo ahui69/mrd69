@@ -86,7 +86,7 @@ WEB_USER_AGENT = os.getenv("WEB_USER_AGENT", "MonolitBot/2.3")
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*")
 
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.deepinfra.com/v1/openai")
-LLM_API_KEY=w52XW0XN6zoV9hdY8OONhLu6tvnFaXbZ
+LLM_API_KEY = os.getenv("LLM_API_KEY", "w52XW0XN6zoV9hdY8OONhLu6tvnFaXbZ")
 LLM_MODEL    = os.getenv("LLM_MODEL", "zai-org/GLM-4.5")
 LLM_TIMEOUT  = int(os.getenv("LLM_HTTP_TIMEOUT_S", "60"))
 
@@ -3205,9 +3205,8 @@ def db_backup()->str:
 # =========================
 
 # ──────────────────────────────────────────────────────────────────────────────
-# ENV dla autonauka
-SERPAPI_KEY = (os.getenv("SERPAPI_KEY") or os.getenv("FIRECRAWL_SERPAPI_KEY")))
-FIRECRAWL_KEY = (os.getenv("FIRECRAWL_API_KEY") or os.getenv("FIRECRAWL_KEY") or os.getenv("FIRECRAWL"))
+# ENV dla autonauka (już zdefiniowane wyżej w linii 96-97, usuwamy duplikaty)
+# SERPAPI_KEY i FIRECRAWL_KEY już są w CONFIG sekcji
 
 WEB_HTTP_TIMEOUT = float(os.getenv("WEB_HTTP_TIMEOUT", "45"))
 AUTO_TOPK = int(os.getenv("AUTO_TOPK", "8"))
