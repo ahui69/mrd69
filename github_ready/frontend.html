@@ -338,28 +338,44 @@
             sendBtn.innerHTML = '<div class="spinner"></div>';
             
             try {
-                // Wywołaj API
-                const endpoint = useWeb ? '/api/auto/learn' : '/api/chat/complete';
-                const body = useWeb ? 
-                    JSON.stringify({q: text}) :
-                    JSON.stringify({text: text, user: 'default'});
+                let resp, data;
                 
-                const resp = await fetch(API_BASE + endpoint, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: body
-                });
-                
-                const data = await resp.json();
-                
-                if (data.ok) {
-                    // Odpowiedź
-                    const answer = data.answer || data.draft || data.context || 'Brak odpowiedzi';
-                    const sources = data.sources || [];
+                if (useWeb) {
+                    // Web search endpoint
+                    resp = await fetch(API_BASE + '/api/research/sources?q=' + encodeURIComponent(text), {
+                        method: 'GET',
+                        headers: {'Authorization': 'Bearer ssjjMijaja6969'}
+                    });
+                    data = await resp.json();
                     
-                    addMsg('assistant', answer, sources.length > 0 ? sources : null);
+                    if (data.ok) {
+                        const answer = data.answer || data.context || 'Brak odpowiedzi';
+                        const sources = data.sources || [];
+                        addMsg('assistant', answer, sources.length > 0 ? sources : null);
+                    } else {
+                        addMsg('system', 'Błąd web: ' + (data.error || 'Nieznany błąd'));
+                    }
                 } else {
-                    addMsg('system', 'Błąd: ' + (data.error || 'Nieznany błąd'));
+                    // Zwykły chat endpoint
+                    resp = await fetch(API_BASE + '/api/chat/assistant', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ssjjMijaja6969'
+                        },
+                        body: JSON.stringify({
+                            messages: [{role: 'user', content: text}],
+                            user_id: 'default'
+                        })
+                    });
+                    data = await resp.json();
+                    
+                    if (data.response || data.answer) {
+                        const answer = data.response || data.answer;
+                        addMsg('assistant', answer);
+                    } else {
+                        addMsg('system', 'Błąd: ' + JSON.stringify(data));
+                    }
                 }
             } catch (err) {
                 addMsg('system', 'Błąd połączenia: ' + err.message);
